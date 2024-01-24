@@ -13,6 +13,7 @@ from tensorboardX import SummaryWriter
 # 导入dataset
 from dataset.simfluence_dataset import SimfluenceDataset
 from dataset.rte_dataset import RteDataset
+from dataset.base_dataset import BaseDataset
 
 # 导入Simulator
 from model.Simulator import Simulator
@@ -41,13 +42,30 @@ logger = logging.getLogger("Simfuence.train")
 
 DATASET = {
     "": None,
-    'rte': RteDataset,
+    'rte': BaseDataset,
+    'boolq': BaseDataset,
+    'sst2': BaseDataset,
+    'webnlg': BaseDataset,
+    'wmt16_de_en': BaseDataset,
 }
 
 DATASET_ADDITIONAL_ARGS = {
     "": {},
     'rte': {
-        'data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/datasets--glue'
+        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_199_train.json',
+        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_276_eval.json',
+    },
+    'boolq': {
+
+    },
+    'sst2': {
+
+    },
+    'webnlg': {
+
+    },
+    'wmt16_de_en': {
+        
     }
 }
 
