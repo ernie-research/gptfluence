@@ -53,20 +53,23 @@ DATASET_ADDITIONAL_ARGS = {
     "": {},
     'rte': {
         'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_199_train.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_276_eval.json',
+        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_199_eval.json',
     },
     'boolq': {
-        'train_data_path': 
-
+        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/boolq/boolq_train_0-199.json',
+        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/boolq/boolq_validation_0-199.json',
     },
     'sst2': {
-
+        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_train_0-199.json',
+        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_validation_0-199.json'
     },
     'webnlg': {
+        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/webnlg/webnlg_train_0-199.json',
+        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/webnlg/webnlg_dev_0_99.json'
 
     },
     'wmt16_de_en': {
-        
+
     }
 }
 
