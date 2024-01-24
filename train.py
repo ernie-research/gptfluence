@@ -56,6 +56,7 @@ DATASET_ADDITIONAL_ARGS = {
         'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_276_eval.json',
     },
     'boolq': {
+        'train_data_path': 
 
     },
     'sst2': {
