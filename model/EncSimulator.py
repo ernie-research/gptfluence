@@ -60,18 +60,20 @@ class EncSimulator(nn.Module):
         
     
     def _get_initial_embeds(self, dataset, device):
-        sample_id_dict = {}
-        test_sample_id_dict = {}
+        sample_id_dict = dataset.id_to_text_train
+        test_sample_id_dict = dataset.id_to_text_eval
+        # sample_id_dict = {}
+        # test_sample_id_dict = {}
         print(f'initial embeds ...')
-        for d in tqdm(dataset):
-            # 获取评估样本的文本和id
-            test_sample_id, test_sample_text = d['test_sample_id'], d['test_sample_text']
-            if test_sample_id_dict.get(test_sample_id) is None:
-                test_sample_id_dict[test_sample_id] = test_sample_text[0]
-            # 获取训练集样本的文本和id
-            for sample_id, sample_text in zip(d['samples_id'], d['samples_texts']):
-                if sample_id_dict.get(sample_id) is None:
-                    sample_id_dict[sample_id] = sample_text
+        # for d in tqdm(dataset):
+        #     # 获取评估样本的文本和id
+        #     test_sample_id, test_sample_text = d['test_sample_id'], d['test_sample_text']
+        #     if test_sample_id_dict.get(test_sample_id) is None:
+        #         test_sample_id_dict[test_sample_id] = test_sample_text[0]
+        #     # 获取训练集样本的文本和id
+        #     for sample_id, sample_text in zip(d['samples_id'], d['samples_texts']):
+        #         if sample_id_dict.get(sample_id) is None:
+        #             sample_id_dict[sample_id] = sample_text
 
         sample_embed_tensors = self._sample_id_dict_to_embed(sample_id_dict, device)
         self.embed = nn.Embedding.from_pretrained(sample_embed_tensors, freeze=self.frozen)
@@ -163,7 +165,8 @@ class EncSimulator(nn.Module):
             Returns:
                 `embeds`: tensor of shape (len(texts), hidden_dim)
             '''
-            tokenized = self.tokenizer(texts, return_tensors='pt', padding=True)
+            tokenized = self.tokenizer(texts, return_tensors='pt', padding=True, truncation=True, max_length=512)
+            print('\r 编码器最大长度为：512', end="")
             input_ids = tokenized['input_ids'].to(device)
             attention_mask = tokenized['attention_mask'].to(device)
             token_type_ids = tokenized['token_type_ids'].to(device)
