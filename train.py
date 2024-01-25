@@ -146,6 +146,8 @@ def train(
     test_num = 2,
     weight_decay=0.,
     step_thres=None,
+    test_example_start_id=-1,
+    test_example_end_id=-1,
 ):
 
     def setup_seed(seed):
@@ -324,6 +326,8 @@ def train(
         f"weight_decay: {weight_decay}\n",
         f"output_dir: {output_dir}\n",
         f"step_thres: {step_thres}\n"
+        f"test_example_start_id: {test_example_start_id}\n",
+        f"test_example_end_id: {test_example_end_id}\n",
     )
 
     log_dir = "tb-logs"
@@ -349,9 +353,9 @@ def train(
     valid_num = valid_num
     test_num = test_num
     
-    valid_dataset = SimfluenceDataset(data_paths[:valid_num], is_train=False, test_example_nums=test_example_nums, step_thres=step_thres)
+    valid_dataset = SimfluenceDataset(data_paths[:valid_num], is_train=False, test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres)
     # test_dataset = SimfluenceDataset(data_paths[valid_num: valid_num + test_num], is_train=False, test_example_nums=test_example_nums, step_thres=step_thres)
-    train_dataset = SimfluenceDataset(data_paths[valid_num + test_num:], test_example_nums=test_example_nums, step_thres=step_thres)
+    train_dataset = SimfluenceDataset(data_paths[valid_num + test_num:], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres)
     
     print('')
     print(f'valid dataset: {data_paths[:valid_num]}')

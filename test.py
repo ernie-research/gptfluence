@@ -75,6 +75,8 @@ def main(
     check_point_path = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None/checkpoint-233.pt",
     save_dir = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None",
     hyper_parameter = 0.,
+    test_example_start_id=-1,
+    test_example_end_id=-1,
 ):
     print("task:", task)
     print("dataset:", dataset_name)
@@ -93,7 +95,7 @@ def main(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")   
 
 
-    test_dataset = SimfluenceDataset(data_paths_dict[dataset_name], test_example_nums=test_example_nums, is_train=False, step_thres=None)
+    test_dataset = SimfluenceDataset(data_paths_dict[dataset_name], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None)
     # 加载数据集
     dataset = DATASET[dataset_name]
     if dataset is None:

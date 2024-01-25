@@ -5,8 +5,12 @@ import torch
 import numpy as np
 
 class SimfluenceDataset(Dataset):
-    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None):
+    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1):
         self.test_example_nums = test_example_nums
+        self.test_example_start_id = test_example_start_id
+        self.test_example_end_id = test_example_end_id
+        assert test_example_start_id != -1 and test_example_end_id != -1, '请设置test_example_start_id和test_example_end_id'
+        assert (test_example_end_id - test_example_start_id + 1) == test_example_nums, 'test_example_nums与test_example_start_id和test_example_end_id不匹配'
         self.is_train = is_train
         self.dataset = list()
         self.step_thres = step_thres
@@ -59,7 +63,8 @@ class SimfluenceDataset(Dataset):
             with open(all_loss_trajectory_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
                 for i, line in enumerate(lines):
-                    if i >= self.test_example_nums:
+                    if i < self.test_example_start_id or i > self.test_example_end_id:
+                    # if i >= self.test_example_nums:
                         break
                     test_sample_loss_trajectory = list()
                     line = json.loads(line)
@@ -84,7 +89,8 @@ class SimfluenceDataset(Dataset):
                 lines = f.readlines()
                 for i, line in enumerate(lines):
                     simulator_train_data_list = list()
-                    if i >= self.test_example_nums:
+                    if i < self.test_example_start_id or i > self.test_example_end_id:
+                    # if i >= self.test_example_nums:
                         break
                     test_sample_loss_trajectory = list()
                     line = json.loads(line)
