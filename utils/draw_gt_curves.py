@@ -6,7 +6,7 @@ from tqdm import tqdm
 if __name__ == '__main__':
     # 绘制评估样本的曲线
     # trajectory文件路径
-    ROOR_DIR="/root/paddlejob/workspace/liuqingyi01/code/Simfluence/runs/wmt16_de_en_test/output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-1"
+    ROOR_DIR="/root/paddlejob/workspace/liuqingyi01/code/Simfluence/runs/boolq/output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-1//"
     PATH = f"{ROOR_DIR}/all_loss_trajectory.out"
     # 图片保存目录
     SAVE_DIR = ROOR_DIR
