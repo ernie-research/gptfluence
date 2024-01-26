@@ -6,10 +6,13 @@ with torch.no_grad():
     def eval_simulator(eval_dataset, model, device, input_kwargs_keys):
         model.eval()
         all_steps_mse = 0.
+        all_steps_mae = 0.
         all_steps_mse_list = []
+        all_steps_mae_list = []
         pred_loss_dict = defaultdict(list)
         for eval_data in tqdm(eval_dataset):
             step_mse_loss_list = []
+            steps_mae_list = []
             predict_loss = None
             test_sample_id = eval_data[0]["test_sample_id"]
             start_step = eval_data[0]["prev_step"]
@@ -57,5 +60,26 @@ with torch.no_grad():
 
                 step_mse_loss = output['mse_loss'].item()
                 step_mse_loss_list.append(step_mse_loss)
-            all_steps_mse += np.array(step_mse_loss_list).mean()
-        return all_steps_mse / len(eval_dataset), pred_loss_dict
+                steps_mae_list.append(abs(predict_loss - data['cur_loss']))
+            # all_steps_mse += np.array(step_mse_loss_list).mean()
+            # all_steps_mae += np.array(steps_mae_list).mean()
+            all_steps_mse_list.append(np.array(step_mse_loss_list).mean())
+            all_steps_mae_list.append(np.array(steps_mae_list).mean())
+        
+        # 计算不同runs的指标均值和方差
+        # all steps mse
+        all_steps_mse_np = np.array(all_steps_mse_list)
+        all_steps_mse_mean = all_steps_mse_np.mean()
+        all_steps_mse_std = all_steps_mse_np.std()
+        # all steps mae
+        all_steps_mae_np = np.array(all_steps_mae_list)
+        all_steps_mae_mean = all_steps_mae_np.mean()
+        all_steps_mae_std = all_steps_mae_np.std()
+        
+        return {
+            'all_steps_mse_mean': all_steps_mse_mean,
+            'all_steps_mse_std': all_steps_mse_std,
+            'all_steps_mae_mean': all_steps_mae_mean,
+            'all_steps_mae_std': all_steps_mae_std,
+            'pred_loss_dict': pred_loss_dict
+        }

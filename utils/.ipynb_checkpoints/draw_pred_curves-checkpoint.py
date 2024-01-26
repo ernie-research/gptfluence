@@ -5,7 +5,7 @@ from tqdm import tqdm
 # 设置matplot的颜色
 import matplotlib as mpl
 from cycler import cycler
-mpl.rcParams['axes.prop_cycle'] = cycler(color='bgrcmyk')
+mpl.rcParams['axes.prop_cycle'] = cycler(color='bcrygmk')
 
 # 设置绘图参数 #########################################
 FIG_SAVE_DIR = 'output/figs_rte'
@@ -40,16 +40,17 @@ for test_sample_id, (origins, vecs, encs) in tqdm(enumerate(zip(origin_list, vec
         # print('debug')
         # plt.plot(origin[])
         # 绘制gt曲线
-        plt.plot(origin['step'], origin['gt_loss'], label='gt')
+        plt.plot(origin['step'], origin['gt_loss'], label='gt', linewidth=1.5, color='#dcdcdc')
         # 绘制origin曲线
-        plt.plot(origin['step'], origin['pred_loss'], label='Simufluence')
+        plt.plot(origin['step'], origin['pred_loss'], label='Simfluence', linewidth=1.0, color='#dbdbdb', marker='X', markevery=6)
         # 绘制vec_sim曲线
-        plt.plot(vec['step'], vec['pred_loss'], label='Simufluence+MLP')
+        plt.plot(vec['step'], vec['pred_loss'], label='Simfluence+MLP', linewidth=1.0, color='#909090', marker='P', markevery=6)
         # 绘制enc_sim曲线
-        plt.plot(enc['step'], enc['pred_loss'], label='Ours(feature)')
+        plt.plot(enc['step'], enc['pred_loss'], label='Ours', linewidth=1, color='#59d65a')
         plt.legend()
+        plt.grid(color='#fafbfd')
         plt.title(f'test_sample_id: {test_sample_id}, run_id: {run_id}')
-        plt.xlabel('step')
-        plt.ylabel('loss')
+        plt.xlabel('Training Steps')
+        plt.ylabel('Loss')
         plt.savefig(f'{FIG_SAVE_DIR}/test_sample_{test_sample_id}_run_{run_id}.png')
         plt.clf()

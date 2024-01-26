@@ -64,19 +64,33 @@ data_paths_dict = {
         'runs/wmt16_de_en/output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7',
         'runs/wmt16_de_en/output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8',
         'runs/wmt16_de_en/output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9',
+    ],
+    'webnlg_ood_train': [
+        './runs/webnlg/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-1',
+        './runs/webnlg/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-2',
+        './runs/webnlg/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-3',
+    ],
+    'rte_ood_train': [
+        './runs/rte/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-1',
+        './runs/rte/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-2',
+        './runs/rte/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-3',
     ]
 }
 def main(
     test_example_nums = 200,
     train_example_nums = 200,
-    task = 'boolq',
+    task = '',
+    metric = "",
     sim_name = "original", # "vec_sim" "original"
     dataset_name = "boolq",
     check_point_path = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None/checkpoint-233.pt",
     save_dir = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None",
     hyper_parameter = 0.,
+    test_example_start_id=-1,
+    test_example_end_id=-1,
 ):
     print("task:", task)
+    print("metric:", metric)
     print("dataset:", dataset_name)
     print('simulator', sim_name)
     print()
@@ -93,7 +107,7 @@ def main(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")   
 
 
-    test_dataset = SimfluenceDataset(data_paths_dict[dataset_name], test_example_nums=test_example_nums, is_train=False, step_thres=None)
+    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric)
     # 加载数据集
     dataset = DATASET[dataset_name]
     if dataset is None:
@@ -117,14 +131,19 @@ def main(
     print("\n开始测试...")
     input_kwargs_keys = INPUT_ADDITIONAL_KEYS[sim_name]
     results = eval_simulator(test_dataset, model, device, input_kwargs_keys)
-    print("测试集mse:", results[0])
+    # print("测试集mse:", results[0][0])
+    # print("测试集mae:", results[0][1])
+    print(f'指标: {metric}')
+    print(f"测试集mse 均值:{results['all_steps_mse_mean']} 标准差:{results['all_steps_mse_std']}")
+    print(f"测试集mae 均值:{results['all_steps_mae_mean']} 标准差:{results['all_steps_mae_std']}")
+
 
     # 计算last-step spearman correlation
     last_step_pred = {
         'pred': [],
         'gt': []
     }
-    for test_sample_id, r in results[-1].items():
+    for test_sample_id, r in results['pred_loss_dict'].items():
         for trajectory in r:
             last_step_pred['gt'].append(trajectory['gt_loss'][-1])
             last_step_pred['pred'].append(trajectory['pred_loss'][-1])
@@ -134,16 +153,16 @@ def main(
         
     # 保存结果
     print("\n保存结果...")
-    with open(os.path.join(save_dir, 'pred_and_gt_loss_trajectories.out'), 'w') as f:
-        for test_sample_id, r in results[-1].items():
+    with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'w') as f:
+        for test_sample_id, r in results['pred_loss_dict'].items():
             r = json.dumps(r)
             print(r, file=f)
-    # 画图
+    # # 画图
     # print("\n画图...")
     # fig_save_path = os.path.join(save_dir, 'figs')
     # if not os.path.exists(fig_save_path):
     #     os.mkdir(fig_save_path)
-    # for test_sample_id, r in tqdm(results[-1].items()):
+    # for test_sample_id, r in tqdm(results['pred_loss_dict].items()):
     #     for i, item in enumerate(r):
     #         plt.plot(item['step'], item['gt_loss'], label='gt')
     #         plt.plot(item['step'], item['pred_loss'], label='predict')

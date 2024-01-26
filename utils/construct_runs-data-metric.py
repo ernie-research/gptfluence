@@ -29,10 +29,9 @@ OURPUT_ROOT_DIR = "/root/paddlejob/workspace/env_run/liuqingyi01/tda_output/wmt1
 
 # 输出文件
 OUTPUT_FILE_NAME_LIST = [
-    # pythia-1.4b-deduped
+    # pythia-410m-deduped
     
     # webnlg
-    # "output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-1"
     # 'output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-1',
     # 'output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-2',
     # 'output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-3',
@@ -65,6 +64,10 @@ OUTPUT_FILE_NAME_LIST = [
     # 'output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-30',
     # 'output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-31',
     # 'output_webnlg_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-32',
+    # "output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-1",
+    # "output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-2",
+    # "output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-3",
+
 
     # wmt16_de_en
     'output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-1',
@@ -100,7 +103,6 @@ OUTPUT_FILE_NAME_LIST = [
     'output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7',
     'output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8',
     'output_wmt16_de_en_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9',
-
 
 ]
 # 训练的step数  
@@ -149,30 +151,42 @@ for output_file_name in OUTPUT_FILE_NAME_LIST:
     # all_loss_trajectory.out 格式：
     # {'id': 1, 'loss_trajectory': [{'step': step1, 'loss': loss11}, {'step': step2, 'loss': loss12}]}
     # {'id': 2, 'loss_trajectory': [{'step': step1, 'loss': loss21}, {'step': step2, 'loss': loss22}]}
-    eval_processed_result_path = os.path.join(SAVE_ROOT_DIR, output_file_name, 'all_loss_trajectory.out')
 
-    if os.path.exists(eval_processed_result_path):
-        print(f'{eval_processed_result_path} 已存在，跳过')
-    else:
-        eval_data_list = defaultdict(list)
-        for step in range(1, STEP_NUM+1):
-            loss_trajectory_file_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, f"metric_{TASK}/metric_{TASK}_checkpoint-{step}.out")
-            if not os.path.exists(loss_trajectory_file_path):
-                print(f"step: {step} 评估文件不存在，跳过")
-                continue
-            with open(loss_trajectory_file_path, "r") as f:
-                lines = f.readlines()
-                for line in lines:
-                    line = line.strip()
-                    line = json.loads(line)
-                    id = line['id']
-                    loss = line['loss']
-                    eval_data_list[id].append({'step': step, 'loss': loss})
-        with open(eval_processed_result_path, 'w', encoding='utf-8') as f:
-            for k, v in eval_data_list.items():
-                print(json.dumps({'id': k, 'loss_trajectory': v}), file=f)
-        print(f"测试样本数量: {len(eval_data_list)}")
-        print("\n")
+    # 记录每个metric的变化轨迹
+    METRIC = [
+        'loss',
+        'rouge1',
+        'rouge2',
+        'rougeL',
+        'bleu',
+    ]
+    for metric in METRIC:
+        print(f"处理{metric}...")
+        eval_processed_result_path = os.path.join(SAVE_ROOT_DIR, output_file_name, f'all_{metric}_trajectory.out')
+
+        if os.path.exists(eval_processed_result_path):
+            print(f'{eval_processed_result_path} 已存在，跳过')
+        else:
+            eval_data_list = defaultdict(list)
+            for step in range(1, STEP_NUM+1):
+                loss_trajectory_file_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, f"metric_{TASK}/metric_{TASK}_checkpoint-{step}.out")
+                if not os.path.exists(loss_trajectory_file_path):
+                    print(f"step: {step} 评估文件不存在，跳过")
+                    continue
+                with open(loss_trajectory_file_path, "r") as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        line = line.strip()
+                        line = json.loads(line)
+                        id = line['id']
+                        # loss = line['loss']
+                        loss = line[metric]
+                        eval_data_list[id].append({'step': step, 'loss': loss})
+            with open(eval_processed_result_path, 'w', encoding='utf-8') as f:
+                for k, v in eval_data_list.items():
+                    print(json.dumps({'id': k, 'loss_trajectory': v}), file=f)
+            print(f"测试样本数量: {len(eval_data_list)}")
+            print("\n")
 
 end = time.time()
 print(f"总共处理时间: {end - start}s")
