@@ -74,6 +74,30 @@ data_paths_dict = {
         './runs/rte/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-1',
         './runs/rte/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-2',
         './runs/rte/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-3',
+    ],
+    'flan': [
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-5/',
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-6/',
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7/',
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8/',
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9/',
+    ],
+    'flan_pythia-1b': [
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-5/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-6/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-7/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-8/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-9/",
+    ],
+    'flan_rte_ood': [
+        'runs/flan_ood/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-1/',
+        'runs/flan_ood/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-2/',
+        'runs/flan_ood/output_rte-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-3/',
+    ],
+    'flan_webnlg_ood': [
+        'runs/flan_ood/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-1',
+        'runs/flan_ood/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-2',
+        'runs/flan_ood/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-3',
     ]
 }
 def main(
@@ -136,27 +160,45 @@ def main(
     print(f'指标: {metric}')
     print(f"测试集mse 均值:{results['all_steps_mse_mean']} 标准差:{results['all_steps_mse_std']}")
     print(f"测试集mae 均值:{results['all_steps_mae_mean']} 标准差:{results['all_steps_mae_std']}")
-
-
-    # 计算last-step spearman correlation
-    last_step_pred = {
-        'pred': [],
-        'gt': []
-    }
-    for test_sample_id, r in results['pred_loss_dict'].items():
-        for trajectory in r:
-            last_step_pred['gt'].append(trajectory['gt_loss'][-1])
-            last_step_pred['pred'].append(trajectory['pred_loss'][-1])
-
-    last_step_spearman = stats.spearmanr(last_step_pred['gt'], last_step_pred['pred']).statistic
-    print("测试集last step spearman:", last_step_spearman)
         
     # 保存结果
     print("\n保存结果...")
-    with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'w') as f:
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'w', encoding='utf-8') as f:
         for test_sample_id, r in results['pred_loss_dict'].items():
             r = json.dumps(r)
             print(r, file=f)
+
+    # 计算last-step spearman correlation ################################
+    from collections import defaultdict
+    last_step = {
+        'pred': defaultdict(list),
+        'gt': defaultdict(list)
+    }
+    with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+        for line in lines:
+            line = json.loads(line)
+            for runs_id, trajectory in enumerate(line):
+                last_step['pred'][runs_id].append(trajectory['pred_loss'][-1])
+                last_step['gt'][runs_id].append(trajectory['gt_loss'][-1])
+    
+    total_runs_num = len(last_step['pred'])
+    last_step_spearman_list = []
+    for i in range(total_runs_num):
+        last_step_spearman_list.append(
+            stats.spearmanr(last_step['gt'][i], last_step['pred'][i] ).statistic
+        )
+    # import pdb; pdb.set_trace()
+    last_step_spearman_np = np.array(last_step_spearman_list)
+    last_step_spearman_mean = last_step_spearman_np.mean()
+    last_step_spearman_std = last_step_spearman_np.std()
+    print(f"测试集last step spearman 均值: {last_step_spearman_mean}, 标准差: {last_step_spearman_std}")
+
+
+
+
     # # 画图
     # print("\n画图...")
     # fig_save_path = os.path.join(save_dir, 'figs')
