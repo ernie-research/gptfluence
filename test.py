@@ -130,8 +130,11 @@ def main(
     # 设置设备
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")   
 
-
-    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric)
+    if sim_name == 'norder_enc_sim':
+        order_n  = SIMULATR_ADDIONAL_ARGS['norder_enc_sim']['order_n']
+    else:
+        order_n = -1
+    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric, order_n=order_n)
     # 加载数据集
     dataset = DATASET[dataset_name]
     if dataset is None:
@@ -146,7 +149,7 @@ def main(
 
     # 加载simulator
     model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **SIMULATR_ADDIONAL_ARGS[sim_name]).to(device)
-    if sim_name == 'enc_sim':
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim':
         if SIMULATR_ADDIONAL_ARGS[sim_name]['use_initial']:
             model._get_initial_embeds(test_dataset, device)
     model.load_state_dict(torch.load(check_point_path))

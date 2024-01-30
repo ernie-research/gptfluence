@@ -63,24 +63,31 @@ class BaseDataset(Dataset):
         return len(self.simfluencedataset)
     
     def collate_fn(self, data, device=None):
+        res = {}
         prev_step = [d['prev_step'] for d in data]
+        res['prev_step'] = prev_step
         prev_loss = torch.tensor([d['prev_loss'] for d in data]).to(device)
+        res['prev_loss'] = prev_loss
         cur_step = [d['cur_step'] for d in data]
+        res['cur_step'] = cur_step
         cur_loss = torch.tensor([d['cur_loss'] for d in data]).to(device)
+        res['cur_loss'] = cur_loss
         samples_id = torch.tensor([d['samples_id'] for d in data]).to(device)
+        res['samples_id'] = samples_id
         test_sample_id = torch.tensor([d['test_sample_id'] for d in data]).to(device)
+        res['test_sample_id'] = test_sample_id
         samples_texts = [d['samples_texts'] for d in data]
+        res['samples_texts'] = samples_texts
         test_sample_text = [d['test_sample_text'] for d in data]
-        return {
-            'prev_step': prev_step,
-            'prev_loss': prev_loss,
-            'cur_step': cur_step,
-            'cur_loss': cur_loss,
-            'samples_id': samples_id,
-            'test_sample_id': test_sample_id,
-            'samples_texts': samples_texts,
-            'test_sample_text': test_sample_text,
-        }
+        res['test_sample_text'] = test_sample_text
+        # 处理n阶markov
+        keys = data[0].keys()
+        if 'prev_n_steps' in keys and 'prev_n_losses' in keys:
+            prev_steps = [d['prev_n_steps'] for d in data]
+            res['prev_n_steps'] = prev_steps
+            prev_losses = torch.tensor([d['prev_n_losses'] for d in data]).to(device)
+            res['prev_n_losses'] = prev_losses
+        return res
 
 if __name__ == "__main__":
     from dataset.simfluence_dataset import SimfluenceDataset
