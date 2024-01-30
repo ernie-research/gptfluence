@@ -28,22 +28,22 @@ class EncSimulator(nn.Module):
         # self.fcb = nn.Linear(self.hidden_dim, 1)
 
         # MLP
-        self.mlp_a = nn.Sequential(
-            nn.Linear(self.hidden_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.hidden_dim),
-        )
+        # self.mlp_a = nn.Sequential(
+        #     nn.Linear(self.hidden_dim, self.hidden_dim),
+        #     nn.ReLU(),
+        #     nn.Linear(self.hidden_dim, self.hidden_dim),
+        # )
 
-        self.mlp_b = nn.Sequential(
-            nn.Linear(self.hidden_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.hidden_dim),
-        )
+        # self.mlp_b = nn.Sequential(
+        #     nn.Linear(self.hidden_dim, self.hidden_dim),
+        #     nn.ReLU(),
+        #     nn.Linear(self.hidden_dim, self.hidden_dim),
+        # )
 
-        # self.fc = nn.Linear(self.hidden_dim, 100)
-        # self.relu = nn.ReLU()
-        # self.fca = nn.Linear(100, 100)
-        # self.fcb = nn.Linear(100, 100)
+        self.fc = nn.Linear(self.hidden_dim * 2, 100)
+        self.relu = nn.ReLU()
+        self.fca = nn.Linear(100, 1)
+        self.fcb = nn.Linear(100, 1)
 
         # 1.：mlp embed纬度，a,b参数共享
         # 2.：不同交互方式
@@ -119,15 +119,21 @@ class EncSimulator(nn.Module):
         x_src = self.embed(orders) # (bs, ft_bs, hid_dim)
         x_tgt = self.test_embed(test_sample_ids) # (bs, 1, hid_dim)
 
-        # 计算a
-        x_src_a = self.mlp_a(x_src)
-        x_tgt_a = self.mlp_a(x_tgt)
-        a = torch.mul(x_src_a, x_tgt_a.unsqueeze(1)).sum(dim=-1)
+        x = torch.cat([x_src, x_tgt.repeat(1, ft_bs, 1)], dim=-1) # (bs, ft_bs+1, hid_dim)])
+        x = self.fc(x)
+        x = self.relu(x)
+        a = self.fca(x).squeeze(-1)
+        b = self.fcb(x).squeeze(-1)
 
-        # 计算b
-        x_src_b = self.mlp_b(x_src)
-        x_tgt_b = self.mlp_b(x_tgt)
-        b = torch.mul(x_src_b, x_tgt_b.unsqueeze(1)).sum(dim=-1)
+        # # 计算a
+        # x_src_a = self.mlp_a(x_src)
+        # x_tgt_a = self.mlp_a(x_tgt)
+        # a = torch.mul(x_src_a, x_tgt_a.unsqueeze(1)).sum(dim=-1)
+
+        # # 计算b
+        # x_src_b = self.mlp_b(x_src)
+        # x_tgt_b = self.mlp_b(x_tgt)
+        # b = torch.mul(x_src_b, x_tgt_b.unsqueeze(1)).sum(dim=-1)
 
 
 
