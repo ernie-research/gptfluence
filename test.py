@@ -112,6 +112,8 @@ def main(
     hyper_parameter = 0.,
     test_example_start_id=-1,
     test_example_end_id=-1,
+    order_n=None,
+    concate=None,
 ):
     print("task:", task)
     print("metric:", metric)
@@ -130,8 +132,22 @@ def main(
     # 设置设备
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")   
 
+    simulator_args = SIMULATR_ADDIONAL_ARGS[sim_name]
+    # 命令行参数将重写`simulator_args`
+    if order_n is not None and 'order_n' in simulator_args.keys():
+        print(f"重写order_n: {order_n}")
+        simulator_args['order_n'] = order_n
+    if concate is not None and 'concate' in simulator_args.keys():
+        print(f'重写concate: {concate}')
+        if concate == True:
+            simulator_args['concate'] = True
+        elif concate == False:
+            simulator_args['concate'] = False
+        else:
+            raise NotImplementedError
+            
     if sim_name == 'norder_enc_sim':
-        order_n  = SIMULATR_ADDIONAL_ARGS['norder_enc_sim']['order_n']
+        order_n  = simulator_args['order_n']
     else:
         order_n = -1
     test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric, order_n=order_n)
@@ -148,9 +164,10 @@ def main(
 
 
     # 加载simulator
-    model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **SIMULATR_ADDIONAL_ARGS[sim_name]).to(device)
+    model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args).to(device)
+
     if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim':
-        if SIMULATR_ADDIONAL_ARGS[sim_name]['use_initial']:
+        if simulator_args['use_initial']:
             model._get_initial_embeds(test_dataset, device)
     model.load_state_dict(torch.load(check_point_path))
     model.to(device)
