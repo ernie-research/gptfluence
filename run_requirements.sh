@@ -10,3 +10,4 @@ pip install sentencepiece
 pip install matplotlib
 pip install datasets
 pip install scipy
+pip install sckit-learn
