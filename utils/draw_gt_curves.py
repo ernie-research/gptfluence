@@ -6,14 +6,18 @@ from tqdm import tqdm
 if __name__ == '__main__':
     # 绘制评估样本的曲线
     # trajectory文件路径
-    ROOR_DIR="/root/paddlejob/workspace/liuqingyi01/code/Simfluence/runs/rte/output_rte_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_seed-1/"
+    ROOR_DIR="/root/paddlejob/workspace/liuqingyi01/code/Simfluence/runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-29/"
     METRIC = 'loss'
     print(f'即将即将绘制测试样本的{METRIC}的变化曲线')
     PATH = f"{ROOR_DIR}/all_{METRIC}_trajectory.out"
-    # 图片保存目录
-    SAVE_DIR = os.path.join(ROOR_DIR, f'figs_{METRIC}_trajectory')
+
     # 绘制前N个样本的曲线
-    N = -1
+    N = 100
+    START = 855
+    TASK='wmt16_de_en'
+
+    # 图片保存目录
+    SAVE_DIR = os.path.join(ROOR_DIR, f'figs_{TASK}_{METRIC}_trajectory')
     print(f"绘制前{N}个样本的曲线")
     
     # 记录前N个样本的测试集loss
@@ -22,7 +26,7 @@ if __name__ == '__main__':
     
     with open(PATH, 'r') as f:
         lines = f.readlines()
-        for line in tqdm(lines[:N]):
+        for line in tqdm(lines[START:N+START]):
             line = json.loads(line)
             sample_id = line['id']
             steps = []

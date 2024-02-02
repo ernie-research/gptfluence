@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 class SimfluenceDataset(Dataset):
-    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1, metric=""):
+    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1, metric="", order_n=-1):
         self.test_example_nums = test_example_nums
         # test_example_start_id和test_example_end_id是字符串，通过`,`分隔，表示多个区间
         if isinstance(test_example_start_id, str) and isinstance(test_example_end_id, str):
@@ -16,6 +16,9 @@ class SimfluenceDataset(Dataset):
             # assert (test_example_end_id - test_example_start_id + 1) == test_example_nums, 'test_example_nums与test_example_start_id和test_example_end_id不匹配'
             self.test_example_start_id = [test_example_start_id]
             self.test_example_end_id = [test_example_end_id]
+        self.order_n = order_n
+        if self.order_n != -1:
+            print('n-th order markov:', self.order_n)
         self.is_train = is_train
         self.dataset = list()
         self.step_thres = step_thres
@@ -101,16 +104,43 @@ class SimfluenceDataset(Dataset):
                         test_sample_loss_trajectory.append({'step': l['step'], 'loss': l['loss']})
                         # break
 
-
                     # 构造训练数据
-                    for prev, cur in zip(test_sample_loss_trajectory[:-1], test_sample_loss_trajectory[1:]):
-                        prev_step, prev_loss = prev['step'], prev['loss']
-                        cur_step, cur_loss = cur['step'], cur['loss']
+                    # for prev, cur in zip(test_sample_loss_trajectory[:-1], test_sample_loss_trajectory[1:]):
+                            # prev_step, prev_loss = prev['step'], prev['loss']
+                            # cur_step, cur_loss = cur['step'], cur['loss']
+                    for i in range(1, len(test_sample_loss_trajectory)):
+                        prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
+                        cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
                         if self.step_thres is not None:
                             if cur_step < self.step_thres:
                                 continue
                         samples_id = train_samples_id[cur_step]
-                        simulator_train_data.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
+
+                        if self.order_n != -1 and self.order_n > 1: # N阶markov
+                            N = self.order_n
+                            # 取前i-N, i-N+1, ..., i-1的loss作为前N阶的loss
+                            prev_N = test_sample_loss_trajectory[max(0, i-N):i]
+                            prev_steps = [l['step'] for l in prev_N]
+                            ### i<N，则补全长度为N的列表
+                            prev_steps = [-1] * (N - len(prev_steps)) + prev_steps
+
+                            prev_losses = [l['loss'] for l in prev_N]
+                            ### i<N，则补全长度为N的列表
+                            prev_losses = [0.] * (N - len(prev_losses)) + prev_losses
+                            simulator_train_data.append(
+                                {
+                                    'prev_step': prev_step,
+                                    'prev_loss': prev_loss,
+                                    'cur_step': cur_step,
+                                    'cur_loss': cur_loss,
+                                    'samples_id': samples_id,
+                                    'test_sample_id': test_sample_id,
+                                    'prev_n_steps': prev_steps,
+                                    'prev_n_losses': prev_losses,
+                                }
+                            )
+                        else:
+                            simulator_train_data.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
         else:
             with open(all_loss_trajectory_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
@@ -139,14 +169,49 @@ class SimfluenceDataset(Dataset):
                         test_sample_loss_trajectory.append({'step': l['step'], 'loss': l['loss']})
                         # break
                     # 构造训练数据
-                    for prev, cur in zip(test_sample_loss_trajectory[:-1], test_sample_loss_trajectory[1:]):
-                        prev_step, prev_loss = prev['step'], prev['loss']
-                        cur_step, cur_loss = cur['step'], cur['loss']
+                    # for prev, cur in zip(test_sample_loss_trajectory[:-1], test_sample_loss_trajectory[1:]):
+                    #     prev_step, prev_loss = prev['step'], prev['loss']
+                    #     cur_step, cur_loss = cur['step'], cur['loss']
+                    #     if self.step_thres is not None:
+                    #         if cur_step < self.step_thres:
+                    #             continue
+                    #     samples_id = train_samples_id[cur_step]
+
+                    #     simulator_train_data_list.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
+                    for i in range(1, len(test_sample_loss_trajectory)):
+                        prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
+                        cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
                         if self.step_thres is not None:
                             if cur_step < self.step_thres:
                                 continue
                         samples_id = train_samples_id[cur_step]
-                        simulator_train_data_list.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
+
+                        if self.order_n != -1 and self.order_n > 1: # N阶markov
+                            N = self.order_n
+                            # 取前i-N, i-N+1, ..., i-1的loss作为前N阶的loss
+                            prev_N = test_sample_loss_trajectory[max(0, i-N):i]
+                            prev_steps = [l['step'] for l in prev_N]
+                            ### i<N，则补全长度为N的列表
+                            prev_steps = [-1] * (N - len(prev_steps)) + prev_steps
+
+                            prev_losses = [l['loss'] for l in prev_N]
+                            ### i<N，则补全长度为N的列表
+                            prev_losses = [0.] * (N - len(prev_losses)) + prev_losses
+                            simulator_train_data_list.append(
+                                {
+                                    'prev_step': prev_step,
+                                    'prev_loss': prev_loss,
+                                    'cur_step': cur_step,
+                                    'cur_loss': cur_loss,
+                                    'samples_id': samples_id,
+                                    'test_sample_id': test_sample_id,
+                                    'prev_n_steps': prev_steps,
+                                    'prev_n_losses': prev_losses,
+                                }
+                            )
+                        else:
+                            simulator_train_data_list.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
+                    
                     simulator_train_data.append(simulator_train_data_list)
         return simulator_train_data
     

@@ -37,6 +37,15 @@ with torch.no_grad():
                     before_loss = torch.tensor([predict_loss]).to(device)
                 
                 input_kwargs = {key: data[key] for key in input_kwargs_keys}
+
+                # # 如果是n-th order markov
+                if 'prev_n_losses' in input_kwargs_keys and 'prev_n_steps' in input_kwargs_keys:
+                    # 取出预测的前N步loss
+                    N = model.order_n
+                    prev_pred_n_losses = pred_loss_dict[test_sample_id][-1]['pred_loss'][-N:]
+                    prev_pred_n_losses = [0] * (N - len(prev_pred_n_losses)) + prev_pred_n_losses
+                    input_kwargs['prev_n_losses'] = torch.tensor([prev_pred_n_losses]).to(device)
+
                 output = model(
                     orders=torch.tensor([data["samples_id"]]).to(device),
                     before_loss=before_loss,

@@ -29,18 +29,6 @@ TASK='flan'
 
 # 子任务信息
 SUB_TASKS = {
-    'sst2': {
-        'file_name': 'loss_sst2',
-        'test_sample_id_offset': 0,
-    },
-    'rte': {
-        'file_name': 'loss_rte',
-        'test_sample_id_offset': 0 + 200,
-    },
-    'boolq': {
-        'file_name': 'loss_boolq',
-        'test_sample_id_offset': 0 + 200 + 277,
-    },
     'webnlg': {
         'file_name': 'metric_webnlg',
         'test_sample_id_offset': 0 + 200 + 277 + 200,
@@ -57,13 +45,12 @@ SAVE_ROOT_DIR = f"runs/{TASK}"
 # 输出根目录
 OURPUT_ROOT_DIR = "/root/paddlejob/workspace/env_run/liuqingyi01/tda_output/flan/"
 
-
 # 训练的step数  
-STEP_NUM = 288
+STEP_NUM = 192
 
 # 输出文件
 OUTPUT_FILE_NAME_LIST = [
-    # pythia 410m
+   # FLAN pythia-410m
 # "output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-1/",
 # "output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-17/",
 # "output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-18/",
@@ -105,47 +92,44 @@ OUTPUT_FILE_NAME_LIST = [
 # "output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7/",
 # "output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8/",
 # "output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9/",
-
-    # pythia 1b
-#     "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-1/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-10/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-11/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-12/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-13/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-14/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-15/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-16/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-17/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-18/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-19/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-2/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-20/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-21/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-22/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-23/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-24/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-25/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-26/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-27/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-28/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-29/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-3/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-30/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-31/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-32/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-4/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-5/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-6/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-7/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-8/",
-# "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-9/",
-
-    # pythia 160m
-    'output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-29/',
+    
+    # FLAN pythia 1b
+    "output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-1/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-10/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-11/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-12/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-13/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-14/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-15/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-16/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-17/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-18/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-19/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-2/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-20/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-21/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-22/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-23/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-24/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-25/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-26/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-27/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-28/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-29/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-3/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-30/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-31/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-32/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-4/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-5/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-6/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-7/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-8/",
+"output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-9/",
 ]
 
 def process_file(args):
-    step, file_path, test_sample_id_offset = args
+    step, file_path, test_sample_id_offset, metric = args
     result = defaultdict(list)
     if not os.path.exists(file_path):
         print(f"评估文件 {file_path} 不存在，跳过")
@@ -156,7 +140,7 @@ def process_file(args):
             line = line.strip()
             line = json.loads(line)
             id = line['id'] + test_sample_id_offset
-            loss = line['loss']
+            loss = line[metric]
             result[id].append({'step': step, 'loss': loss})
     return result
 
@@ -202,54 +186,65 @@ for output_file_name in OUTPUT_FILE_NAME_LIST:
     # all_loss_trajectory.out 格式：
     # {'id': 1, 'loss_trajectory': [{'step': step1, 'loss': loss11}, {'step': step2, 'loss': loss12}]}
     # {'id': 2, 'loss_trajectory': [{'step': step1, 'loss': loss21}, {'step': step2, 'loss': loss22}]}
-    eval_processed_result_path = os.path.join(SAVE_ROOT_DIR, output_file_name, 'all_loss_trajectory.out')
+    # 记录每个metric的变化轨迹
+    METRIC = [
+        # 'loss',
+        # 'rouge1',
+        # 'rouge2',
+        'rougeL',
+        'bleu',
+    ]
+    for metric in METRIC:
+        print(f"处理{metric}...")
+        eval_processed_result_path = os.path.join(SAVE_ROOT_DIR, output_file_name, f'all_{metric}_trajectory.out')
 
-    if os.path.exists(eval_processed_result_path):
-        print(f'{eval_processed_result_path} 已存在，跳过')
-    else:
-        eval_data_list = defaultdict(list)
-        tasks = []
-        for step in tqdm(range(1, STEP_NUM+1)):
-            
-            # 读取flan所有子任务的测试集结果
-            for task_name, task_info in SUB_TASKS.items():
+        
+        if os.path.exists(eval_processed_result_path):
+            print(f'{eval_processed_result_path} 已存在，跳过')
+        else:
+            eval_data_list = defaultdict(list)
+            tasks = []
+            for step in tqdm(range(1, STEP_NUM+1)):
+                
+                # 读取flan所有子任务的测试集结果
+                for task_name, task_info in SUB_TASKS.items():
 
-                file_name = task_info['file_name']
-                file_prefix = file_name
-                loss_trajectory_file_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, f"{file_name}/{file_prefix}_checkpoint-{step}.out")
+                    file_name = task_info['file_name']
+                    file_prefix = file_name
+                    loss_trajectory_file_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, f"{file_name}/{file_prefix}_checkpoint-{step}.out")
 
-                test_sample_id_offset = task_info['test_sample_id_offset']
-                tasks.append((step, loss_trajectory_file_path, test_sample_id_offset))
+                    test_sample_id_offset = task_info['test_sample_id_offset']
+                    tasks.append((step, loss_trajectory_file_path, test_sample_id_offset, metric))
 
-                # loss_trajectory_file_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, f"loss_{TASK}/loss_{TASK}_checkpoint-{step}.out")
-                # if not os.path.exists(loss_trajectory_file_path):
-                #     print(f"step: {step} 评估文件不存在，跳过")
-                #     continue
-                # with open(loss_trajectory_file_path, "r") as f:
-                #     lines = f.readlines()
-                #     for line in lines:
-                #         line = line.strip()
-                #         line = json.loads(line)
-                #         id = line['id'] + test_sample_id_offset
-                #         loss = line['loss']
-                #         eval_data_list[id].append({'step': step, 'loss': loss})
+                    # loss_trajectory_file_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, f"loss_{TASK}/loss_{TASK}_checkpoint-{step}.out")
+                    # if not os.path.exists(loss_trajectory_file_path):
+                    #     print(f"step: {step} 评估文件不存在，跳过")
+                    #     continue
+                    # with open(loss_trajectory_file_path, "r") as f:
+                    #     lines = f.readlines()
+                    #     for line in lines:
+                    #         line = line.strip()
+                    #         line = json.loads(line)
+                    #         id = line['id'] + test_sample_id_offset
+                    #         loss = line['loss']
+                    #         eval_data_list[id].append({'step': step, 'loss': loss})
 
-        with ProcessPoolExecutor() as executor:
-            for result in executor.map(process_file, tasks):
-                for k, v in result.items():
-                    eval_data_list[k].extend(v)
+            with ProcessPoolExecutor() as executor:
+                for result in executor.map(process_file, tasks):
+                    for k, v in result.items():
+                        eval_data_list[k].extend(v)
 
-        sorted_eval_data_list = {}
-        # 对eval_data_list中测试样本的trajectory按照step排序
-        for test_sample_id, v in eval_data_list.items():
-            trajectory = sorted(eval_data_list[test_sample_id], key=lambda x:x['step'])
-            sorted_eval_data_list[test_sample_id] = trajectory
+            sorted_eval_data_list = {}
+            # 对eval_data_list中测试样本的trajectory按照step排序
+            for test_sample_id, v in eval_data_list.items():
+                trajectory = sorted(eval_data_list[test_sample_id], key=lambda x:x['step'])
+                sorted_eval_data_list[test_sample_id] = trajectory
 
-        with open(eval_processed_result_path, 'w', encoding='utf-8') as f:
-            for k, v in eval_data_list.items():
-                print(json.dumps({'id': k, 'loss_trajectory': v}), file=f)
-        print(f"测试样本数量: {len(eval_data_list)}")
-        print("\n")
+            with open(eval_processed_result_path, 'w', encoding='utf-8') as f:
+                for k, v in eval_data_list.items():
+                    print(json.dumps({'id': k, 'loss_trajectory': v}), file=f)
+            print(f"测试样本数量: {len(eval_data_list)}")
+            print("\n")
 
 end = time.time()
 print(f"总共处理时间: {end - start}s")

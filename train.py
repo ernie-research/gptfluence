@@ -20,6 +20,7 @@ from model.Simulator import Simulator
 from model.XlmrSimulator import XlmrSimulator
 from model.VectorSimulator import VectorSimulator
 from model.EncSimulator import EncSimulator
+from model.NOrder_EncSimulator import NOrder_EncSimulator
 
 from utils.eval import eval_simulator
 
@@ -83,6 +84,7 @@ SIMULATORS = {
     'vec_sim': VectorSimulator,
     'xlmr_sim': XlmrSimulator,
     'enc_sim': EncSimulator,
+    'norder_enc_sim': NOrder_EncSimulator,
 }
 
 SIMULATR_ADDIONAL_ARGS = {
@@ -100,6 +102,13 @@ SIMULATR_ADDIONAL_ARGS = {
         'frozen': True,
         'use_initial': True,
         'concate': False
+    },
+    'norder_enc_sim': {
+        'order_n': 10,
+        'enc_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/models--sentence-transformers--all-MiniLM-L6-v2/',
+        'frozen': True,
+        'use_initial': True,
+        'concate': False
     }
 }
 
@@ -110,6 +119,12 @@ INPUT_ADDITIONAL_KEYS ={
     'enc_sim': {
         'samples_texts',
         'test_sample_text',
+    },
+    'norder_enc_sim': {
+        'samples_texts',
+        'test_sample_text',
+        'prev_n_steps',
+        'prev_n_losses',
     }
 }
 
@@ -123,6 +138,9 @@ SAVE_DIR_IGNORED_ARG_NAME = {
         'test_xlm_ids_file',
     ],
     'enc_sim': [
+        'enc_model_name_or_path',
+    ],
+    'norder_enc_sim': [
         'enc_model_name_or_path',
     ]
 }
@@ -153,6 +171,8 @@ def train(
     step_thres=None,
     test_example_start_id=-1,
     test_example_end_id=-1,
+    order_n=None,
+    concate=None,
 ):
 
     def setup_seed(seed):
@@ -367,6 +387,11 @@ def train(
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-31/",
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-32/",
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-4/",
+        ],
+        'debug': [
+            'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
+            'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
+            'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
         ]
     }
     # data_paths = [
@@ -402,8 +427,21 @@ def train(
         os.makedirs(log_dir)
 
     # 设置tensorboard日志保存路径
-    save_dir_name = f'/{task}/{sim_name}_task-{task}_metric-{metric}_lr-{lr}_lambda-{hyper_parameter}_wd-{weight_decay}_bs-{train_bs}_train-sample-nums-{train_example_nums}_test-sample-nums-{test_example_nums}_seed-{seed}_step_thres-{step_thres}'
+    save_dir_name = f'/{task}/{sim_name}_task-{task}_metric-{metric}_lr-{lr}_lambda-{hyper_parameter}_wd-{weight_decay}_bs-{train_bs}_train-sample-nums-{train_example_nums}_test-sample-nums-{test_example_nums}_seed-{seed}_step_thres-{step_thres}_max_epoch-{max_epoch}'
     simulator_args = SIMULATR_ADDIONAL_ARGS[sim_name]
+    # 命令行参数将重写`simulator_args`
+    if order_n is not None and 'order_n' in simulator_args.keys():
+        print(f"重写order_n: {order_n}")
+        simulator_args['order_n'] = order_n
+    if concate is not None and 'concate' in simulator_args.keys():
+        print(f'重写concate: {concate}')
+        if concate == True:
+            simulator_args['concate'] = True
+        elif concate == False:
+            simulator_args['concate'] = False
+        else:
+            raise NotImplementedError
+
     ignore_args = SAVE_DIR_IGNORED_ARG_NAME[sim_name]
     for args_name, args_value in simulator_args.items():
         if args_name in ignore_args:
@@ -421,13 +459,18 @@ def train(
     valid_num = valid_num
     test_num = test_num
     
-    valid_dataset = SimfluenceDataset(data_paths[:valid_num], is_train=False, test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric)
-    # test_dataset = SimfluenceDataset(data_paths[valid_num: valid_num + test_num], is_train=False, test_example_nums=test_example_nums, step_thres=step_thres)
-    train_dataset = SimfluenceDataset(data_paths[valid_num + test_num:], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric)
+    if sim_name == 'norder_enc_sim':
+        order_n = simulator_args['order_n']
+        print(f"order_n: {order_n}\n")
+    else:
+        order_n = -1
+    valid_dataset = SimfluenceDataset(data_paths[:valid_num], is_train=False, test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric, order_n=order_n)
+    train_dataset = SimfluenceDataset(data_paths[valid_num + test_num:], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric, order_n=order_n)
     
+
+
     print('')
     print(f'valid dataset: {data_paths[:valid_num]}')
-    # print(f'test dataset: {data_paths[valid_num: valid_num + test_num]}')
     print(f'train dataset: {data_paths[valid_num + test_num:]}')
     print('')
 
@@ -456,11 +499,11 @@ def train(
     train_data_loader = DataLoader(train_dataset, batch_size=train_bs, shuffle=True, collate_fn=lambda x: train_dataset.collate_fn(x, device=device))
 
     # 加载simulator
-    model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **SIMULATR_ADDIONAL_ARGS[sim_name])
+    model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args)
     model.to(device).train()
 
-    if sim_name == 'enc_sim':
-        if SIMULATR_ADDIONAL_ARGS[sim_name]['use_initial']:
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim':
+        if simulator_args['use_initial']:
             model._get_initial_embeds(train_dataset, device)
 
     # criterion = nn.MSELoss(reduction="mean")                                                
@@ -544,6 +587,9 @@ def train(
             # early stop
             if early_stop_count == early_stop_N:
                 print('early stop, exit。')
+                net_save_path = os.path.join(net_save_dir, 'last-checkpoint.pt')
+                torch.save(model.state_dict(), net_save_path)
+                print('save last checkpoint')
                 return
             
             # 保存最后一个epoch的checkpoint
