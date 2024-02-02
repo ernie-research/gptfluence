@@ -47,14 +47,14 @@ class HFTracInCPFast(TracInCPFast):
                 test_batch[-1],
                 self.test_loss_fn,
                 self.test_reduction_type,
-            ) # (test_bs*test_seq, vocab_size)
+            ) # (test_bs, test_seq * vocab_size)
 
             src_jacobian, src_layer_input = self._basic_computation_tracincp_fast(
                 train_batch[0:-1],
                 train_batch[-1],
                 self.loss_fn,
                 self.reduction_type,
-            ) # (train_bs*train_seq, vocab_size)
+            ) # (train_bs, train_seq * vocab_size)
             return (
                 _tensor_batch_dot(
                     input_jacobians, src_jacobian
@@ -104,17 +104,11 @@ class HFTracInCPFast(TracInCPFast):
         )
 
         input_ids, attention_mask = tuple(inputs)
-        # input_ids_list, attention_mask_list = tuple(inputs)
-        # labels_list = targets
         device = self.model.device
-        # input_ids = torch.stack(input_ids_list).to(device)
-        # attention_mask = torch.stack(attention_mask_list).to(device)
-        # targets = torch.stack(labels_list).to(device) # (bs, seq_len)
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
         targets = targets.to(device)
 
-        # out = self.model(*inputs)
         out = self.model(
             input_ids,
             attention_mask,
@@ -250,13 +244,12 @@ def TracInCPSimulator(
     max_length: int = getattr(kwargs, 'max_length', 2048)
 
     # 设置tokenizer
-    model = AutoModelForCausalLM.from_pretrained(checkpoints_path[0]).to(device)
-    # debug without model #########################################
-    # model = kwargs['model']
-    ################################################################
-    tokenizer = AutoTokenizer.from_pretrained(checkpoints_path[0])
-    tokenizer.pad_token_id = tokenizer.eos_token_id
-    tokenizer.padding_side = 'left'
+    # model = AutoModelForCausalLM.from_pretrained(checkpoints_path[0]).to(device)
+    # tokenizer = AutoTokenizer.from_pretrained(checkpoints_path[0])
+    # tokenizer.pad_token_id = tokenizer.eos_token_id
+    # tokenizer.padding_side = 'left'
+    model = kwargs['model']
+    tokenizer = kwargs['tokenizer']
     
     step_train_dataset = EveryStepDataset(
         data=train_data,
@@ -377,7 +370,7 @@ if __name__ == "__main__":
 
 
     hf_tracin_cp_fast = HFTracInCPFast(
-        model=model,
+        model=None,
         final_fc_layer='embed_out',
         checkpoints_load_func=checkpoints_load_func,
         train_dataset=step_train_dataset,
