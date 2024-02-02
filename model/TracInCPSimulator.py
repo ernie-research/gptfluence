@@ -217,7 +217,7 @@ class EveryStepDataset(Dataset):
 # 需要自定义checkpoint load函数，
 def checkpoints_load_func(model, path):
     # 目前直接加载pytorch_model.bin
-    model=torch.load(os.path.join(path, 'pytorch_model.bin'))
+    # model=torch.load(os.path.join(path, 'pytorch_model.bin'))
     # 从training_args.bin中读取学习率
     trainer_state = json.load(open(os.path.join(path, 'trainer_state.json'), 'r', encoding='utf-8'))
     learning_rate = trainer_state['log_history'][-1]['learning_rate']
@@ -251,6 +251,9 @@ def TracInCPSimulator(
 
     # 设置tokenizer
     model = AutoModelForCausalLM.from_pretrained(checkpoints_path[0]).to(device)
+    # debug without model #########################################
+    # model = kwargs['model']
+    ################################################################
     tokenizer = AutoTokenizer.from_pretrained(checkpoints_path[0])
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.padding_side = 'left'
@@ -273,7 +276,7 @@ def TracInCPSimulator(
     )
 
     # 设置训练集batch size
-    batch_size = getattr(kwargs, 'train_batch_size', 8)
+    batch_size = getattr(kwargs, 'train_batch_size', 2)
 
     # 设置final_fc_layer
     final_fc_layer: str = getattr(kwargs, 'final_fc_layer', 'embed_out')

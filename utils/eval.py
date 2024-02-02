@@ -131,9 +131,14 @@ def eval_tracincp_simulator(eval_dataset, model, device, step_ckpt_dir, input_kw
 
             # 通过kwargs设置TracInCPSimulator的参数 ######################
             ### 设置checkpoint path
-            cur_step = data['cur_step']
-            # input_kwargs['path'] = [os.path.join(step_ckpt_dir, f'checkpoint-{cur_step}')]
-            input_kwargs['path'] = [os.path.join(step_ckpt_dir, f'checkpoint-2')]
+            prev_step = data['prev_step']
+            input_kwargs['path'] = [os.path.join(step_ckpt_dir, f'checkpoint-{prev_step}')]
+            # debug
+            # input_kwargs['path'] = [os.path.join(step_ckpt_dir, f'checkpoint-2')]
+            # from transformers import AutoModelForCausalLM
+            # checkpoints_path = input_kwargs['path']
+            # gpt_model = AutoModelForCausalLM.from_pretrained(checkpoints_path[0]).to(device)
+            # input_kwargs['model'] = gpt_model
             ############################################################
 
             output = model(
