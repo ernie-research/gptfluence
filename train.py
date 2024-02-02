@@ -110,9 +110,8 @@ SIMULATR_ADDIONAL_ARGS = {
         'enc_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/models--sentence-transformers--all-MiniLM-L6-v2/',
         'frozen': True,
         'use_initial': True,
-        'concate': False
-    },
-    'tracincp_sim': {}
+        'concate': True
+    }
 }
 
 INPUT_ADDITIONAL_KEYS ={
