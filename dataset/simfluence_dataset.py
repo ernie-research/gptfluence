@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 class SimfluenceDataset(Dataset):
-    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1, metric="", order_n=-1):
+    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1, metric="", order_n=-1, cp_interval=None):
         self.test_example_nums = test_example_nums
         # test_example_start_id和test_example_end_id是字符串，通过`,`分隔，表示多个区间
         if isinstance(test_example_start_id, str) and isinstance(test_example_end_id, str):
@@ -19,6 +19,9 @@ class SimfluenceDataset(Dataset):
         self.order_n = order_n
         if self.order_n != -1:
             print('n-th order markov:', self.order_n)
+        self.cp_interval = cp_interval
+        if self.cp_interval is not None:
+            print('cp interval:', self.cp_interval)
         self.is_train = is_train
         self.dataset = list()
         self.step_thres = step_thres
@@ -109,8 +112,23 @@ class SimfluenceDataset(Dataset):
                             # prev_step, prev_loss = prev['step'], prev['loss']
                             # cur_step, cur_loss = cur['step'], cur['loss']
                     for i in range(1, len(test_sample_loss_trajectory)):
-                        prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
-                        cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
+                        # 增加 cp_interval 参数，按间隔估计当前步的loss #######################################
+                        cp_interval = self.cp_interval
+                        if cp_interval is not None:
+                            prev_i = ((i-1) // cp_interval) * cp_interval
+                            cur_i = prev_i + cp_interval
+                            if cur_i >= len(test_sample_loss_trajectory): # 处理最后一个点不在cp_interval内的情况
+                                cur_i = -1
+                            prev_step = test_sample_loss_trajectory[i-1]['step']   
+                            cur_step = test_sample_loss_trajectory[i]['step']
+                            prev_loss = test_sample_loss_trajectory[prev_i]['loss']    
+                            cur_loss = test_sample_loss_trajectory[cur_i]['loss']
+                        else:
+                            prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
+                            cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
+                        ###################################################################################
+                        # prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
+                        # cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
                         if self.step_thres is not None:
                             if cur_step < self.step_thres:
                                 continue
@@ -179,6 +197,19 @@ class SimfluenceDataset(Dataset):
 
                     #     simulator_train_data_list.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
                     for i in range(1, len(test_sample_loss_trajectory)):
+                        # 增加 cp_interval 参数，按间隔估计当前步的loss #######################################
+                        # cp_interval = self.cp_interval
+                        # if cp_interval is not None:
+                        #     prev_i = ((i-1) // cp_interval) * cp_interval
+                        #     cur_i = prev_i + cp_interval
+                        #     prev_step = test_sample_loss_trajectory[i-1]['step']   
+                        #     cur_step = test_sample_loss_trajectory[i]['step']
+                        #     prev_loss = test_sample_loss_trajectory[prev_i]['loss']    
+                        #     cur_loss = test_sample_loss_trajectory[cur_i]['loss']
+                        # else:
+                        #     prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
+                        #     cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
+                        ###################################################################################
                         prev_step, prev_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']    
                         cur_step, cur_loss = test_sample_loss_trajectory[i]['step'], test_sample_loss_trajectory[i]['loss']
                         if self.step_thres is not None:
