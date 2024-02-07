@@ -92,6 +92,7 @@ SIMULATORS = {
     'enc_sim': EncSimulator,
     'norder_enc_sim': NOrder_EncSimulator,
     'tracincp_sim': TracInCPSimulator,
+    'enc_cp_sim': EncSimulator,
 }
 
 SIMULATR_ADDIONAL_ARGS = {
@@ -117,7 +118,14 @@ SIMULATR_ADDIONAL_ARGS = {
         'use_initial': True,
         'concate': True
     },
-    'tracincp_sim': {}
+    "tracincp_sim": {},
+    "enc_cp_sim": {
+        'enc_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/models--sentence-transformers--all-MiniLM-L6-v2/',
+        'frozen': True,
+        'use_initial': True,
+        'concate': False,
+        'cp_interval': 1,
+    }
 }
 
 INPUT_ADDITIONAL_KEYS ={
@@ -139,6 +147,10 @@ INPUT_ADDITIONAL_KEYS ={
         'test_sample_text',
         'samples_contexts',
         'test_sample_context',
+    },
+    'enc_cp_sim': {
+        'samples_texts',
+        'test_sample_text',
     }
 }
 
@@ -157,7 +169,10 @@ SAVE_DIR_IGNORED_ARG_NAME = {
     'norder_enc_sim': [
         'enc_model_name_or_path',
     ],
-    'tracincp_sim': []
+    'tracincp_sim': [],
+    'enc_cp_sim': [
+        'enc_model_name_or_path',
+    ]
 }
 
 def train(
@@ -188,6 +203,7 @@ def train(
     test_example_end_id=-1,
     order_n=None,
     concate=None,
+    cp_interval=None,
 ):
 
     def setup_seed(seed):
@@ -519,6 +535,9 @@ def train(
             simulator_args['concate'] = False
         else:
             raise NotImplementedError
+    if cp_interval is not None and 'cp_interval' in simulator_args.keys():
+        print(f"重写cp_interval: {cp_interval}")
+        simulator_args['cp_interval'] = cp_interval
 
     ignore_args = SAVE_DIR_IGNORED_ARG_NAME[sim_name]
     for args_name, args_value in simulator_args.items():
@@ -543,7 +562,7 @@ def train(
     else:
         order_n = -1
     valid_dataset = SimfluenceDataset(data_paths[:valid_num], is_train=False, test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric, order_n=order_n)
-    train_dataset = SimfluenceDataset(data_paths[valid_num + test_num:], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric, order_n=order_n)
+    train_dataset = SimfluenceDataset(data_paths[valid_num + test_num:], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, step_thres=step_thres, metric=metric, order_n=order_n, cp_interval=cp_interval)
     
 
 

@@ -3,7 +3,6 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy import stats
 
-
 # 定义一元二次方程
 def func(x, gt, pred):
     return np.sum((pred*x[0] + x[1] - gt)**2)
