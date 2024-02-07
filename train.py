@@ -617,7 +617,7 @@ def train(
     model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args)
     model.to(device).train()
 
-    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim':
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim':
         if simulator_args['use_initial']:
             model._get_initial_embeds(train_dataset, device)
 
