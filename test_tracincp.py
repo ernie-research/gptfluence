@@ -110,6 +110,9 @@ data_paths_dict = {
     ],
     'flan_pythia-1b_tracincp': [
         'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-5/'
+    ],
+    'dataset_debug_sst2_tracincp': [
+        'runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-0/'
     ]
 }
 def main(
@@ -150,7 +153,11 @@ def main(
         order_n  = simulator_args['order_n']
     else:
         order_n = -1
-    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric)
+    
+    if self_influence:
+        print('目前选择通过tracincp计算self-influence')
+
+    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric, self_influence=self_influence)
     # 加载数据集
     # dataset = DATASET[dataset_name]
     dataset = TracInCPDataset
@@ -177,6 +184,15 @@ def main(
     input_kwargs_keys = INPUT_ADDITIONAL_KEYS[sim_name]
     if self_influence:
         results = eval_tracincp_self_influence(test_dataset, model, device, step_ckpt_dir, input_kwargs_keys, ckpt_steps)
+        self_influence = results['self_influence']
+        sorted_self_influence = sorted(self_influence.items(), key=lambda x: x[1], reverse=True)
+        # 保存结果
+        print("\n保存结果...")
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        with open(os.path.join(save_dir, f'sorted_self_influence.out'), 'w', encoding='utf-8') as f:
+            for sample_id, self_inf in sorted_self_influence:
+                print(json.dumps({sample_id: self_inf}), file=f)
     else:
         results = eval_tracincp_simulator(test_dataset, model, device, step_ckpt_dir, input_kwargs_keys, ckpt_steps)
         # print("测试集mse:", results[0][0])
