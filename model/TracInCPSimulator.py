@@ -269,7 +269,7 @@ def TracInCPSimulator(
     )
 
     # 设置训练集batch size
-    batch_size = getattr(kwargs, 'train_batch_size', 2)
+    batch_size = getattr(kwargs, 'train_batch_size', 4)
 
     # 设置final_fc_layer
     final_fc_layer: str = getattr(kwargs, 'final_fc_layer', 'embed_out')

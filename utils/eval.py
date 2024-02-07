@@ -97,7 +97,7 @@ with torch.no_grad():
     
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
-def eval_tracincp_simulator(eval_dataset, model, device, step_ckpt_dir, input_kwargs_keys):
+def eval_tracincp_simulator(eval_dataset, model, device, step_ckpt_dir, input_kwargs_keys, ckpt_steps=None):
     all_steps_mse_list = []
     all_steps_mae_list = []
     pred_loss_dict = defaultdict(list)
@@ -108,13 +108,34 @@ def eval_tracincp_simulator(eval_dataset, model, device, step_ckpt_dir, input_kw
             prev_step = data['prev_step']
             eval_dataset_wrt_prev_step[prev_step].append(data)
 
-
+    gpt_model = None
+    tokenizer = None
+    model_name_list = []
+    
+    # 处理ckpt_steps
+    ### ckpt_steps 要么是`None`要么是`str`
+    if ckpt_steps is not None:
+        assert isinstance(ckpt_steps, str), "请通过字符串设置ckpt_steps"
+        ckpt_steps = list(map(int, ckpt_steps.split(',')))
+        # import pdb; pdb.set_trace()
     for prev_step, eval_data in tqdm(eval_dataset_wrt_prev_step.items()):
-        model_name_or_path = os.path.join(step_ckpt_dir, f'checkpoint-{prev_step}')
-        gpt_model = AutoModelForCausalLM.from_pretrained(model_name_or_path).to(device)
-        tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-        tokenizer.pad_token_id = tokenizer.eos_token_id
-        tokenizer.padding_side = 'left'
+        if ckpt_steps is not None:
+            for ckpt_step in ckpt_steps:
+                if prev_step <= ckpt_step:
+                    model_name_or_path = os.path.join(step_ckpt_dir, f'checkpoint-{ckpt_step}')
+                    print(f'load checkpoint-{ckpt_step}')
+                    break
+        else:
+            model_name_or_path = os.path.join(step_ckpt_dir, f'checkpoint-{prev_step}')
+            print(f'load checkpoint-{prev_step}')
+
+        
+        if model_name_or_path not in model_name_list:
+            model_name_list.append(model_name_or_path)
+            gpt_model = AutoModelForCausalLM.from_pretrained(model_name_or_path).to(device)
+            tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+            tokenizer.pad_token_id = tokenizer.eos_token_id
+            tokenizer.padding_side = 'left'
         
         run_id = 0
         for i, data in enumerate(eval_data):

@@ -50,6 +50,7 @@ DATASET = {
     'webnlg': BaseDataset,
     'wmt16_de_en': BaseDataset,
     'flan': BaseDataset,
+    'dataset_debug_sst2': BaseDataset,
 }
 
 DATASET_ADDITIONAL_ARGS = {
@@ -77,6 +78,10 @@ DATASET_ADDITIONAL_ARGS = {
     'flan': {
         'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_flan/train/flan_train_0_1599.json',
         'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_flan/eval/flan_eval_0_1054.json'
+    },
+    'dataset_debug_sst2': {
+        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_flan-prompt_dataset-debug_mislabelled-0.4_train_0-127.json',
+        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_flan-prompt_dataset-debug_eval_0-127.json'
     }
 }
 
@@ -111,7 +116,8 @@ SIMULATR_ADDIONAL_ARGS = {
         'frozen': True,
         'use_initial': True,
         'concate': True
-    }
+    },
+    'tracincp_sim': {}
 }
 
 INPUT_ADDITIONAL_KEYS ={
@@ -397,10 +403,73 @@ def train(
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-32/",
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-4/",
         ],
+        'flan_pythia-160m': [
+            "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-1",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-10",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-11",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-12",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-13",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-14",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-15",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-16",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-17",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-18",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-19",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-2",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-20",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-21",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-22",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-23",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-24",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-25",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-26",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-27",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-28",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-29",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-3",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-30",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-31",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-32",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-4",
+        ],
         'debug': [
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
+        ],
+        'dataset_debug_sst2': [
+            "runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-1/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-10/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-11/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-12/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-13/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-14/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-15/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-16/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-17/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-18/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-19/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-2/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-20/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-21/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-22/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-23/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-24/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-25/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-26/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-27/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-28/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-29/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-3/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-30/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-31/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-32/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-4/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-5/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-6/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-7/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-8/",
+"runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-9/",
         ]
     }
     # data_paths = [
