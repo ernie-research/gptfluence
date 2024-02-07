@@ -98,6 +98,27 @@ data_paths_dict = {
         'runs/flan_ood/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-1',
         'runs/flan_ood/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-2',
         'runs/flan_ood/output_webnlg-ood_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-1e-6_weight-decay-0.001_epoch-3_loss-output-token_seed-3',
+    ],
+    'flan_pythia-160m': [
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-5",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-6",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-160m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9",
+    ],
+    'flan_pythia-70m': [
+        "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-70m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-5",
+        "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-70m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-6",
+        "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-70m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7",
+        "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-70m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8",
+        "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-70m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9",
+    ],
+    'flan_pythia-14m': [
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-5/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-6/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-7/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-8/",
+"runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-9/",
     ]
 }
 def main(
@@ -166,7 +187,7 @@ def main(
     # 加载simulator
     model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args).to(device)
 
-    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim':
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim':
         if simulator_args['use_initial']:
             model._get_initial_embeds(test_dataset, device)
     model.load_state_dict(torch.load(check_point_path))

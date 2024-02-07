@@ -57,6 +57,7 @@ with torch.no_grad():
                     device=device,
                     **input_kwargs
                 )
+                # import pdb; pdb.set_trace()
 
                 if torch.isnan(output['mse_loss']).all():
                     raise ValueError(f"mse_loss is nan, before loss is {predict_loss}")
