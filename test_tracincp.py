@@ -15,7 +15,7 @@ from model.Simulator import Simulator
 from model.XlmrSimulator import XlmrSimulator
 from model.VectorSimulator import VectorSimulator
 
-from utils.eval import eval_simulator, eval_tracincp_simulator
+from utils.eval import eval_simulator, eval_tracincp_simulator, eval_tracincp_self_influence
 
 import logging
 logging.basicConfig(
@@ -107,6 +107,12 @@ data_paths_dict = {
         ],
     'flan_tracincp': [
         'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-5/'
+    ],
+    'flan_pythia-1b_tracincp': [
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-1b-deduped_lr-2e-7_weight-decay-0.001_epoch-2_loss-output-token_seed-5/'
+    ],
+    'dataset_debug_sst2_tracincp': [
+        'runs/dataset_debug_sst2/output_sst2-dataset-debug-is-mislabelled_bs-4_shot-128_sample-128_model-pythia-410m-deduped_lr-1e-06_weight-decay-0.001_epoch-1_loss-output-token_seed-0/'
     ]
 }
 def main(
@@ -121,6 +127,8 @@ def main(
     test_example_start_id=-1,
     test_example_end_id=-1,
     step_ckpt_dir=None,
+    ckpt_steps=None,
+    self_influence=False,
 ):
     print("task:", task)
     print("metric:", metric)
@@ -145,7 +153,11 @@ def main(
         order_n  = simulator_args['order_n']
     else:
         order_n = -1
-    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric)
+    
+    if self_influence:
+        print('目前选择通过tracincp计算self-influence')
+
+    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric, self_influence=self_influence)
     # 加载数据集
     # dataset = DATASET[dataset_name]
     dataset = TracInCPDataset
@@ -170,67 +182,79 @@ def main(
 
     print("\n开始测试...")
     input_kwargs_keys = INPUT_ADDITIONAL_KEYS[sim_name]
-    results = eval_tracincp_simulator(test_dataset, model, device, step_ckpt_dir, input_kwargs_keys)
-    # print("测试集mse:", results[0][0])
-    # print("测试集mae:", results[0][1])
-    print(f'指标: {metric}')
-    print(f"测试集mse 均值:{results['all_steps_mse_mean']} 标准差:{results['all_steps_mse_std']}")
-    print(f"测试集mae 均值:{results['all_steps_mae_mean']} 标准差:{results['all_steps_mae_std']}")
+    if self_influence:
+        results = eval_tracincp_self_influence(test_dataset, model, device, step_ckpt_dir, input_kwargs_keys, ckpt_steps)
+        self_influence = results['self_influence']
+        sorted_self_influence = sorted(self_influence.items(), key=lambda x: x[1], reverse=True)
+        # 保存结果
+        print("\n保存结果...")
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        with open(os.path.join(save_dir, f'sorted_self_influence.out'), 'w', encoding='utf-8') as f:
+            for sample_id, self_inf in sorted_self_influence:
+                print(json.dumps({sample_id: self_inf}), file=f)
+    else:
+        results = eval_tracincp_simulator(test_dataset, model, device, step_ckpt_dir, input_kwargs_keys, ckpt_steps)
+        # print("测试集mse:", results[0][0])
+        # print("测试集mae:", results[0][1])
+        print(f'指标: {metric}')
+        print(f"测试集mse 均值:{results['all_steps_mse_mean']} 标准差:{results['all_steps_mse_std']}")
+        print(f"测试集mae 均值:{results['all_steps_mae_mean']} 标准差:{results['all_steps_mae_std']}")
+            
+        # 保存结果
+        print("\n保存结果...")
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'w', encoding='utf-8') as f:
+            for test_sample_id, r in results['pred_loss_dict'].items():
+                r = json.dumps(r)
+                print(r, file=f)
+
+        # 计算last-step spearman correlation ################################
+        from collections import defaultdict
+        last_step = {
+            'pred': defaultdict(list),
+            'gt': defaultdict(list)
+        }
+        with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            for line in lines:
+                line = json.loads(line)
+                for runs_id, trajectory in enumerate(line):
+                    last_step['pred'][runs_id].append(trajectory['pred_loss'][-1])
+                    last_step['gt'][runs_id].append(trajectory['gt_loss'][-1])
         
-    # 保存结果
-    print("\n保存结果...")
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'w', encoding='utf-8') as f:
-        for test_sample_id, r in results['pred_loss_dict'].items():
-            r = json.dumps(r)
-            print(r, file=f)
-
-    # 计算last-step spearman correlation ################################
-    from collections import defaultdict
-    last_step = {
-        'pred': defaultdict(list),
-        'gt': defaultdict(list)
-    }
-    with open(os.path.join(save_dir, f'pred_and_gt_{metric}_trajectories.out'), 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-        for line in lines:
-            line = json.loads(line)
-            for runs_id, trajectory in enumerate(line):
-                last_step['pred'][runs_id].append(trajectory['pred_loss'][-1])
-                last_step['gt'][runs_id].append(trajectory['gt_loss'][-1])
-    
-    total_runs_num = len(last_step['pred'])
-    last_step_spearman_list = []
-    for i in range(total_runs_num):
-        last_step_spearman_list.append(
-            stats.spearmanr(last_step['gt'][i], last_step['pred'][i] ).statistic
-        )
-    # import pdb; pdb.set_trace()
-    last_step_spearman_np = np.array(last_step_spearman_list)
-    last_step_spearman_mean = last_step_spearman_np.mean()
-    last_step_spearman_std = last_step_spearman_np.std()
-    print(f"测试集last step spearman 均值: {last_step_spearman_mean}, 标准差: {last_step_spearman_std}")
+        total_runs_num = len(last_step['pred'])
+        last_step_spearman_list = []
+        for i in range(total_runs_num):
+            last_step_spearman_list.append(
+                stats.spearmanr(last_step['gt'][i], last_step['pred'][i] ).statistic
+            )
+        # import pdb; pdb.set_trace()
+        last_step_spearman_np = np.array(last_step_spearman_list)
+        last_step_spearman_mean = last_step_spearman_np.mean()
+        last_step_spearman_std = last_step_spearman_np.std()
+        print(f"测试集last step spearman 均值: {last_step_spearman_mean}, 标准差: {last_step_spearman_std}")
 
 
 
 
-    # # 画图
-    # print("\n画图...")
-    # fig_save_path = os.path.join(save_dir, 'figs')
-    # if not os.path.exists(fig_save_path):
-    #     os.mkdir(fig_save_path)
-    # for test_sample_id, r in tqdm(results['pred_loss_dict].items()):
-    #     for i, item in enumerate(r):
-    #         plt.plot(item['step'], item['gt_loss'], label='gt')
-    #         plt.plot(item['step'], item['pred_loss'], label='predict')
-    #         plt.xlabel('step')
-    #         plt.ylabel('loss')
-    #         plt.title('test sample id:' + str(test_sample_id) + '-' + str(i))
-    #         plt.legend()
-    #         plt.grid()
-    #         plt.savefig(os.path.join(fig_save_path, str(test_sample_id) + '-' + str(i) + '.png'))
-    #         plt.clf()
+        # # 画图
+        # print("\n画图...")
+        # fig_save_path = os.path.join(save_dir, 'figs')
+        # if not os.path.exists(fig_save_path):
+        #     os.mkdir(fig_save_path)
+        # for test_sample_id, r in tqdm(results['pred_loss_dict].items()):
+        #     for i, item in enumerate(r):
+        #         plt.plot(item['step'], item['gt_loss'], label='gt')
+        #         plt.plot(item['step'], item['pred_loss'], label='predict')
+        #         plt.xlabel('step')
+        #         plt.ylabel('loss')
+        #         plt.title('test sample id:' + str(test_sample_id) + '-' + str(i))
+        #         plt.legend()
+        #         plt.grid()
+        #         plt.savefig(os.path.join(fig_save_path, str(test_sample_id) + '-' + str(i) + '.png'))
+        #         plt.clf()
     print('done')
 
 if __name__ == "__main__":

@@ -8,14 +8,16 @@ from cycler import cycler
 mpl.rcParams['axes.prop_cycle'] = cycler(color='bcrygmk')
 
 # 设置绘图参数 #########################################
-FIG_SAVE_DIR = 'test/figs/flan_tracincp_sst2_rescaled'
+TASK = 'rte'
+
+FIG_SAVE_DIR = f'output/figs/flan/flan_tracincp_{TASK}_rescaled'
 if os.path.exists(FIG_SAVE_DIR) is False:
     os.makedirs(FIG_SAVE_DIR)
 print("保存图片的文件夹名称：", FIG_SAVE_DIR.split('/')[-1])
 
 METRIC='loss'
 
-ENC_FILE_PATH = f'test/tracincp/rescaled_pred_and_gt_loss_trajectories.out'
+ENC_FILE_PATH = f'output/flan/tracincp_seed-5/{TASK}/rescaled_pred_and_gt_loss_trajectories.out'
 #########################################################
 
 enc_sim_list = []
@@ -35,7 +37,7 @@ for test_sample_id, encs in tqdm(enumerate(enc_sim_list)):
         # # 绘制vec_sim曲线
         # plt.plot(vec['step'], vec['pred_loss'], label='Simfluence+MLP', linewidth=1.0, color='#909090', marker='P', markevery=6)
         # 绘制enc_sim曲线
-        plt.plot(enc['step'], enc['rescaled_pred_loss'], label='Ours', linewidth=1, color='#59d65a')
+        plt.plot(enc['step'], enc['rescaled_pred_loss'], label='TracInCP', linewidth=1, color='#59d65a')
         plt.legend()
         plt.grid()
         plt.title(f'test_sample_id: {test_sample_id}, run_id: {run_id}')
