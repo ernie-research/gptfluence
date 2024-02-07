@@ -218,6 +218,7 @@ def eval_tracincp_self_influence(eval_dataset, model, device, step_ckpt_dir, inp
         # import pdb; pdb.set_trace()
     train_sample_influence = defaultdict(float)
     for prev_step, eval_data in tqdm(eval_dataset_wrt_prev_step.items()):
+
         if ckpt_steps is not None:
             for ckpt_step in ckpt_steps:
                 if prev_step <= ckpt_step:

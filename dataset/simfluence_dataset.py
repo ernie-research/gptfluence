@@ -5,7 +5,7 @@ import torch
 import numpy as np
 
 class SimfluenceDataset(Dataset):
-    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1, metric="", order_n=-1, cp_interval=None):
+    def __init__(self, paths, is_train=True, test_example_nums=10, step_thres=None, test_example_start_id=-1, test_example_end_id=-1, metric="", order_n=-1, cp_interval=None, self_influence=False):
         self.test_example_nums = test_example_nums
         # test_example_start_id和test_example_end_id是字符串，通过`,`分隔，表示多个区间
         if isinstance(test_example_start_id, str) and isinstance(test_example_end_id, str):
@@ -22,6 +22,9 @@ class SimfluenceDataset(Dataset):
         self.cp_interval = cp_interval
         if self.cp_interval is not None:
             print('cp interval:', self.cp_interval)
+        self.self_influence = self_influence
+        if self.self_influence:
+            print('self_influence: ', self.self_influence)
         self.is_train = is_train
         self.dataset = list()
         self.step_thres = step_thres
@@ -197,6 +200,13 @@ class SimfluenceDataset(Dataset):
 
                     #     simulator_train_data_list.append({'prev_step': prev_step, 'prev_loss': prev_loss, 'cur_step': cur_step, 'cur_loss': cur_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
                     for i in range(1, len(test_sample_loss_trajectory)):
+                        # tracincp 需要第一个点 #####
+                        if self.self_influence and i == 1:
+                            first_step, first_loss = test_sample_loss_trajectory[i-1]['step'], test_sample_loss_trajectory[i-1]['loss']
+                            samples_id = train_samples_id[first_step]
+                            simulator_train_data_list.append({'prev_step': 0, 'prev_loss': None, 'cur_step': first_step, 'cur_loss': first_loss, 'samples_id': samples_id, 'test_sample_id': test_sample_id})
+                        ###########################
+
                         # 增加 cp_interval 参数，按间隔估计当前步的loss #######################################
                         # cp_interval = self.cp_interval
                         # if cp_interval is not None:
