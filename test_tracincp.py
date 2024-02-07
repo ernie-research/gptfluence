@@ -104,7 +104,10 @@ data_paths_dict = {
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
-        ]
+        ],
+    'flan_tracincp': [
+        'runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-410m-deduped_lr-2e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-5/'
+    ]
 }
 def main(
     test_example_nums = 200,
@@ -113,13 +116,10 @@ def main(
     metric = "",
     sim_name = "original", # "vec_sim" "original"
     dataset_name = "boolq",
-    check_point_path = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None/checkpoint-233.pt",
     save_dir = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None",
     hyper_parameter = 0.,
     test_example_start_id=-1,
     test_example_end_id=-1,
-    order_n=None,
-    concate=None,
     step_ckpt_dir=None,
 ):
     print("task:", task)
@@ -140,24 +140,12 @@ def main(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")   
 
     simulator_args = SIMULATR_ADDIONAL_ARGS[sim_name]
-    # 命令行参数将重写`simulator_args`
-    if order_n is not None and 'order_n' in simulator_args.keys():
-        print(f"重写order_n: {order_n}")
-        simulator_args['order_n'] = order_n
-    if concate is not None and 'concate' in simulator_args.keys():
-        print(f'重写concate: {concate}')
-        if concate == True:
-            simulator_args['concate'] = True
-        elif concate == False:
-            simulator_args['concate'] = False
-        else:
-            raise NotImplementedError
             
     if sim_name == 'norder_enc_sim':
         order_n  = simulator_args['order_n']
     else:
         order_n = -1
-    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric, order_n=order_n)
+    test_dataset = SimfluenceDataset(data_paths_dict[task], test_example_nums=test_example_nums, test_example_start_id=test_example_start_id, test_example_end_id=test_example_end_id, is_train=False, step_thres=None, metric=metric)
     # 加载数据集
     # dataset = DATASET[dataset_name]
     dataset = TracInCPDataset
@@ -169,8 +157,6 @@ def main(
             is_train=False,
             **DATASET_ADDITIONAL_ARGS[dataset_name]
         )
-      
-
 
     # 加载simulator
     # model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args).to(device)
