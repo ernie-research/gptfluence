@@ -269,3 +269,35 @@ def eval_tracincp_self_influence(eval_dataset, model, device, step_ckpt_dir, inp
     return {
         'self_influence': train_sample_influence
     }
+
+with torch.no_grad():
+    def eval_simulator_self_fluence(eval_dataset, model, device, input_kwargs_keys):
+        model.eval()
+        for eval_data in tqdm(eval_dataset):
+            predict_loss = None
+            test_sample_id = eval_data[0]["test_sample_id"]
+            
+            for step, data in enumerate(eval_data):
+                input_kwargs = {key: data[key] for key in input_kwargs_keys}
+
+            for i, sample_id in enumerate(data['samples_id']):
+                new_input_kwargs = input_kwargs.copy()
+                
+
+                output = model(
+                    orders=torch.tensor([data["samples_id"]]).to(device),
+                    test_sample_ids=torch.tensor([data["test_sample_id"]]).to(device),
+                    is_train=False,
+                    device=device,
+                    **input_kwargs
+                )
+
+        
+        
+        # return {
+        #     'all_steps_mse_mean': all_steps_mse_mean,
+        #     'all_steps_mse_std': all_steps_mse_std,
+        #     'all_steps_mae_mean': all_steps_mae_mean,
+        #     'all_steps_mae_std': all_steps_mae_std,
+        #     'pred_loss_dict': None
+        # }
