@@ -241,7 +241,7 @@ def TracInCPSimulator(
     }
 
     # 设置max_length
-    max_length: int = getattr(kwargs, 'max_length', 2048)
+    max_length: int = kwargs.get('max_length', 2048)
 
     # 设置tokenizer
     # model = AutoModelForCausalLM.from_pretrained(checkpoints_path[0]).to(device)
@@ -269,10 +269,10 @@ def TracInCPSimulator(
     )
 
     # 设置训练集batch size
-    batch_size = getattr(kwargs, 'train_batch_size', 2)
+    batch_size = kwargs.get('train_batch_size', 4)
 
     # 设置final_fc_layer
-    final_fc_layer: str = getattr(kwargs, 'final_fc_layer', 'embed_out')
+    final_fc_layer: str = kwargs.get('final_fc_layer', 'embed_out')
 
     # 设置损失函数
     loss_fn = nn.CrossEntropyLoss(reduction='mean')
@@ -296,19 +296,26 @@ def TracInCPSimulator(
     influence = hf_tracin_cp_fast.influence(
         inputs=test_batch,
     )
-    tot_influence = influence.sum()
 
-    
-    # L_t(z) - L_{t+1}(z) = tot_influence
-    predict_loss = before_loss - tot_influence
-    mse_loss = MSE(predict_loss, after_loss)
-
-    return {
-            "mse_loss": mse_loss, 
-            "L2_loss": None,
-            "predict_loss": predict_loss,
-            "tot_loss": None,
+    return_loss = kwargs.get('return_loss', True)
+    if not return_loss: # 返回influence字典
+        return {
+            'self_influence': influence,
         }
+    else: # 计算loss
+        tot_influence = influence.sum()
+
+
+        # L_t(z) - L_{t+1}(z) = tot_influence
+        predict_loss = before_loss - tot_influence
+        mse_loss = MSE(predict_loss, after_loss)
+
+        return {
+                "mse_loss": mse_loss, 
+                "L2_loss": None,
+                "predict_loss": predict_loss,
+                "tot_loss": None,
+            }
 
 if __name__ == "__main__":
 
