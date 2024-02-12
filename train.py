@@ -96,7 +96,9 @@ SIMULATORS = {
 }
 
 SIMULATR_ADDIONAL_ARGS = {
-    'original': {},
+    'original': {
+        'eval_task': None
+    },
     'vec_sim': {
         'emb_dim': 2
     },
@@ -204,6 +206,7 @@ def train(
     order_n=None,
     concate=None,
     cp_interval=None,
+    eval_task=None
 ):
 
     def setup_seed(seed):
@@ -591,10 +594,16 @@ def train(
         elif concate == False:
             simulator_args['concate'] = False
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
     if cp_interval is not None and 'cp_interval' in simulator_args.keys():
         print(f"重写cp_interval: {cp_interval}")
         simulator_args['cp_interval'] = cp_interval
+    if eval_task is not None:
+        if sim_name == 'original':
+            print(f"重写eval_task： {eval_task}")
+            simulator_args['eval_task'] = eval_task
+        else:
+            raise NotImplementedError()
 
     ignore_args = SAVE_DIR_IGNORED_ARG_NAME[sim_name]
     for args_name, args_value in simulator_args.items():
