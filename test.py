@@ -187,7 +187,7 @@ def main(
     # 加载simulator
     model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args).to(device)
 
-    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim':
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim' or sim_name == 'gpt_sim':
         if simulator_args['use_initial']:
             model._get_initial_embeds(test_dataset, device)
     model.load_state_dict(torch.load(check_point_path))

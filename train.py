@@ -22,6 +22,7 @@ from model.VectorSimulator import VectorSimulator
 from model.EncSimulator import EncSimulator
 from model.NOrder_EncSimulator import NOrder_EncSimulator
 from model.TracInCPSimulator import TracInCPSimulator
+from model.GPTSimulator import GPTSimulator
 
 from utils.eval import eval_simulator
 
@@ -93,6 +94,7 @@ SIMULATORS = {
     'norder_enc_sim': NOrder_EncSimulator,
     'tracincp_sim': TracInCPSimulator,
     'enc_cp_sim': EncSimulator,
+    "gpt_sim": GPTSimulator,
 }
 
 SIMULATR_ADDIONAL_ARGS = {
@@ -125,6 +127,18 @@ SIMULATR_ADDIONAL_ARGS = {
         'use_initial': True,
         'concate': False,
         'cp_interval': 1,
+    },
+    "gpt_sim": {
+        'enc_model_name_or_path': {
+            '160m': '/root/paddlejob/workspace/liuqingyi01/code/alpaca-lora-main/models--EleutherAI--pythia-160m-deduped/',
+        },
+        'frozen': True,
+        'use_initial': True,
+        'concate': False,
+        'max_input_length': {
+            '160m': 2048,
+        },
+        'model_size': None
     }
 }
 
@@ -151,6 +165,10 @@ INPUT_ADDITIONAL_KEYS ={
     'enc_cp_sim': {
         'samples_texts',
         'test_sample_text',
+    },
+    'gpt_sim': {
+        'samples_texts',
+        'test_sample_text',
     }
 }
 
@@ -172,7 +190,11 @@ SAVE_DIR_IGNORED_ARG_NAME = {
     'tracincp_sim': [],
     'enc_cp_sim': [
         'enc_model_name_or_path',
-    ]
+    ],
+    'gpt_sim': [
+        'enc_model_name_or_path',
+        'max_input_length'
+    ],
 }
 
 def train(
@@ -204,6 +226,7 @@ def train(
     order_n=None,
     concate=None,
     cp_interval=None,
+    model_size=None,
 ):
 
     def setup_seed(seed):
@@ -595,6 +618,13 @@ def train(
     if cp_interval is not None and 'cp_interval' in simulator_args.keys():
         print(f"重写cp_interval: {cp_interval}")
         simulator_args['cp_interval'] = cp_interval
+    
+    if model_size is not None and 'model_size' in simulator_args.keys():
+        print(f"重写model_size: {model_size}")
+        simulator_args['model_size'] = model_size
+        simulator_args['enc_model_name_or_path'] = simulator_args['enc_model_name_or_path'][model_size]
+        simulator_args['max_input_length'] = simulator_args['max_input_length'][model_size]
+
 
     ignore_args = SAVE_DIR_IGNORED_ARG_NAME[sim_name]
     for args_name, args_value in simulator_args.items():
@@ -656,7 +686,7 @@ def train(
     model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args)
     model.to(device).train()
 
-    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim':
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim' or sim_name == 'gpt_sim':
         if simulator_args['use_initial']:
             model._get_initial_embeds(train_dataset, device)
 
