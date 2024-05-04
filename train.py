@@ -22,6 +22,7 @@ from model.VectorSimulator import VectorSimulator
 from model.EncSimulator import EncSimulator
 from model.NOrder_EncSimulator import NOrder_EncSimulator
 from model.TracInCPSimulator import TracInCPSimulator
+from model.GPTSimulator import GPTSimulator
 
 from utils.eval import eval_simulator
 
@@ -93,6 +94,7 @@ SIMULATORS = {
     'norder_enc_sim': NOrder_EncSimulator,
     'tracincp_sim': TracInCPSimulator,
     'enc_cp_sim': EncSimulator,
+    "gpt_sim": GPTSimulator,
 }
 
 SIMULATR_ADDIONAL_ARGS = {
@@ -127,6 +129,22 @@ SIMULATR_ADDIONAL_ARGS = {
         'use_initial': True,
         'concate': False,
         'cp_interval': 1,
+    },
+    "gpt_sim": {
+        'enc_model_name_or_path': {
+            '160m': './models--EleutherAI--pythia-160m-deduped/',
+            '410m': '../alpaca-lora-main/models--EleutherAI--pythia-410m-deduped/',
+            '1b': '../alpaca-lora-main/models--EleutherAI--pythia-1b-deduped/',
+        },
+        'frozen': True,
+        'use_initial': True,
+        'concate': False,
+        'max_input_length': {
+            '160m': 2048,
+            '410m': 2048,
+            '1b': 2048,
+        },
+        'model_size': None
     }
 }
 
@@ -153,6 +171,10 @@ INPUT_ADDITIONAL_KEYS ={
     'enc_cp_sim': {
         'samples_texts',
         'test_sample_text',
+    },
+    'gpt_sim': {
+        'samples_texts',
+        'test_sample_text',
     }
 }
 
@@ -174,7 +196,11 @@ SAVE_DIR_IGNORED_ARG_NAME = {
     'tracincp_sim': [],
     'enc_cp_sim': [
         'enc_model_name_or_path',
-    ]
+    ],
+    'gpt_sim': [
+        'enc_model_name_or_path',
+        'max_input_length'
+    ],
 }
 
 def train(
@@ -206,7 +232,8 @@ def train(
     order_n=None,
     concate=None,
     cp_interval=None,
-    eval_task=None
+    eval_task=None,
+    model_size=None,
 ):
 
     def setup_seed(seed):
@@ -508,6 +535,35 @@ def train(
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-32/",
 "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-14m_lr-5e-7_weight-decay-0.001_epoch-3_loss-output-token_seed-4/",
         ],
+        'flan_pythia-2.8b': [
+            "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-1/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-10/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-11/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-12/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-13/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-14/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-15/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-16/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-17/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-18/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-19/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-2/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-20/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-21/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-22/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-23/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-24/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-25/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-26/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-27/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-28/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-29/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-3/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-30/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-31/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-32/",
+    "runs/flan/output_flan_bs-8_shot-200_sample-128_model-pythia-2.8b-deduped_lr-1e-5_weight-decay-0.001_epoch-2_loss-output-token_seed-4/",
+        ],
         'debug': [
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
             'runs/rte/output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3_seed-1',
@@ -604,6 +660,11 @@ def train(
             simulator_args['eval_task'] = eval_task
         else:
             raise NotImplementedError()
+    if model_size is not None and 'model_size' in simulator_args.keys():
+        print(f"重写model_size: {model_size}")
+        simulator_args['model_size'] = model_size
+        simulator_args['enc_model_name_or_path'] = simulator_args['enc_model_name_or_path'][model_size]
+        simulator_args['max_input_length'] = simulator_args['max_input_length'][model_size]
 
     ignore_args = SAVE_DIR_IGNORED_ARG_NAME[sim_name]
     for args_name, args_value in simulator_args.items():
@@ -653,19 +714,13 @@ def train(
             **DATASET_ADDITIONAL_ARGS[dataset_name]
         )
 
-    # debug
-    # -----------------------------------
-    # n = 3
-    # logger.warning(f"only {n} training samples, this is for debugging")
-    # train_dataset = train_dataset[10:10+n]
-    # -----------------------------------
     train_data_loader = DataLoader(train_dataset, batch_size=train_bs, shuffle=True, collate_fn=lambda x: train_dataset.collate_fn(x, device=device))
 
     # 加载simulator
     model = SIMULATORS[sim_name](train_example_nums=train_example_nums, hyper_parameter=hyper_parameter, test_example_nums=test_example_nums, **simulator_args)
     model.to(device).train()
 
-    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim':
+    if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim' or sim_name == 'gpt_sim':
         if simulator_args['use_initial']:
             model._get_initial_embeds(train_dataset, device)
 
@@ -693,7 +748,7 @@ def train(
                 after_loss=data["cur_loss"],
                 test_sample_ids=data["test_sample_id"],
                 device=device,
-                **input_kwargs,
+                kwargs=input_kwargs,
             )
             
             loss = outputs['tot_loss']        
