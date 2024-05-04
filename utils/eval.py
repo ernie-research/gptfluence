@@ -55,8 +55,21 @@ with torch.no_grad():
                     test_sample_ids=torch.tensor([data["test_sample_id"]]).to(device),
                     is_train=False,
                     device=device,
-                    **input_kwargs
+                    kwargs=input_kwargs
                 )
+                # # ===== 计算FLOPs =====
+                #     kwargs=input_kwargs
+                # )
+                # from thop import profile
+                # macs, params = profile(model, inputs=(torch.tensor([data["samples_id"]]).to(device),
+                #     before_loss,
+                #     torch.tensor([data["cur_loss"]]).to(device),
+                #     torch.tensor([data["test_sample_id"]]).to(device),
+                #     False,
+                #     device,
+                #     input_kwargs)
+                # )
+                # print(macs)
                 # import pdb; pdb.set_trace()
 
                 if torch.isnan(output['mse_loss']).all():
@@ -132,6 +145,10 @@ def eval_tracincp_simulator(eval_dataset, model, device, step_ckpt_dir, input_kw
         if model_name_or_path not in model_name_list:
             model_name_list.append(model_name_or_path)
             gpt_model = AutoModelForCausalLM.from_pretrained(model_name_or_path).to(device)
+            
+            # ===== 测试模型FLOPs =====
+            # gpt_model = AutoModelForCausalLM.from_pretrained("/root/paddlejob/workspace/liuqingyi01/code/alpaca-lora-main/models--EleutherAI--pythia-1b-deduped/").to(device)
+
             tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
             tokenizer.pad_token_id = tokenizer.eos_token_id
             tokenizer.padding_side = 'left'
