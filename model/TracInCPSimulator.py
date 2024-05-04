@@ -113,6 +113,13 @@ class HFTracInCPFast(TracInCPFast):
             input_ids,
             attention_mask,
         ).logits # (bs, seq_len, vocab_size)
+        
+        # ===== 测试模型FLOPs =====
+        # from thop import profile
+        # import pdb; pdb.set_trace()
+        # macs, params = profile(self.model, inputs=(input_ids, attention_mask))
+        # print(macs)
+        # pdb.set_trace()
 
         # 计算target的loos
         # shift logits
@@ -277,7 +284,6 @@ def TracInCPSimulator(
     # 设置损失函数
     loss_fn = nn.CrossEntropyLoss(reduction='mean')
 
-
     hf_tracin_cp_fast = HFTracInCPFast(
         model=model,
         final_fc_layer=final_fc_layer,
@@ -287,7 +293,6 @@ def TracInCPSimulator(
         loss_fn=loss_fn,
         batch_size=batch_size,
     )
-    
     # for test_batch in test_dataloader:
     #     output = hf_tracin_cp_fast.influence(
     #         inputs=,
