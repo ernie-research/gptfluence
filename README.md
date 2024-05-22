@@ -12,14 +12,10 @@ We release the GPTDynamics for training and testing the featurized simulator in 
 Preprocess loss trajectory
 ```
 python utils/construct_runs-data-flan-multi-thread.py
-    --STEP_NUM # training steps  
-    --OUTPUT_FILE_NAME_LIST
 ```
 Preprocess metric（BLEU/ROUGE score）trajectory  
 ```
 python utils/construct_runs-data-flan-metric-multi-thread.py
-    --STEP_NUM # training steps
-    --OUTPUT_FILE_NAME_LIST
 ```
 ## Fine-tuning Scenario
 Preprocess loss trajectory
@@ -34,8 +30,6 @@ python utils/construct_runs-data-metric.py
 ## Draw loss/BLEU/ROUGE-L trajectory (Optional)
 ```
 python utils/draw_gt_curves.py
-    --ROOT_DIR # root dir of trajectory data
-    --METRIC # loss/BLEU/ROUGE-L
 ```
 # Featurized Simulator
 ## Set up training, validation, and testing data
