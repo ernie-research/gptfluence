@@ -33,7 +33,7 @@ python utils/draw_gt_curves.py
 ```
 # Featurized Simulator
 ## Set up training, validation, and testing data
-Before training and inference, you should set up training, validation, and test data in the specified scripts. 
+Before training and inference, you should specify training, validation, and test data in the corresponding scripts. 
 You should specify the simulator's training and validation data in `train.py` via the command line argument `--data_paths_dict`; and the simulator's test data in `test.py` via the command line argument `--data_paths_dict`
 
  ## Training
