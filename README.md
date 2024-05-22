@@ -44,12 +44,6 @@ You should specify the simulator's training and validation data in `train.py` vi
  ## Training
  ```
  bash run_enc_sim.sh
-    --dataset_name 
-    --task
-    --train_example_nums
-    --test_example_nums
-    --test_example_start_id    
-    --test_example_end_id
 ```
   
  ## Evaluation
