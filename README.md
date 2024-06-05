@@ -40,7 +40,7 @@ python utils/draw_gt_curves.py
 # Featurized Simulator
 ## Set up training, validation, and testing data
 Before training and inference, you should specify training, validation, and test data in the corresponding scripts. 
-You should specify the simulator's training and validation data in `train.py` via the command line argument `--data_paths_dict`; and the simulator's test data in `test.py` via the command line argument `--data_paths_dict`
+You should specify the simulator's training and validation data in `train.py` via the command line argument `--data_paths_dict`; and the simulator's test data in `test.py` via the command line argument `--data_paths_dict`. If you follow the steps above to download our open-source GPTDynamics data, you don't have to set it up `additionally -- data_paths_dict` and use the default configuration of the script species.
 
  ## Training
  ```
