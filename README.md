@@ -7,7 +7,7 @@ To run the code, you should install the dependency libraries.
 bash run_requirements.sh
 ```
 # GPTDynamics
-We release the GPTDynamics for training and testing the featurized simulator in [huggingface](https://huggingface.co/datasets/baidu/GPTDynamics). To preprocess the data, you should follow the instructions below:
+We release the GPTDynamics for training and testing the featurized simulator in [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics). To preprocess the data, you should follow the instructions below:
 ## Instruction-tuning Scenario
 Preprocess loss trajectory
 ```
