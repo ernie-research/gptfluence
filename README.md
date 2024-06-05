@@ -9,7 +9,7 @@ bash run_requirements.sh
 # GPTDynamics
 We release the GPTDynamics for training and testing the featurized simulator in [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics). To preprocess the data, you should follow the instructions below:
 ## Download
-First you need to download the data in the `GPTDynamics/gptdynamics` directory from [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics) locally. The data contains two parts, the first part is `GPTDynamics/gptdynamics/sft_tasks` and `GPTDynamics/gptdynamics/sft_tasks` correspond to the data samples for training, evaluation, and testing used in instruction fine-tuning and fine-tuning scenarios, respectively. You need to fill the local data paths into `DATASET_ADDITIONAL_ARGS` of `train.py` according to the task names to read the samples from the paths you provided; the second part is `GPTDynamics/gptdynamics/GPTDynamics.tar`, which contains the training runs, you need to extracted
+First, you need to download the data in the `GPTDynamics/gptdynamics` directory from [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics) locally. The data contains two parts, the first part is `GPTDynamics/gptdynamics/sft_tasks` and `GPTDynamics/gptdynamics/sft_tasks` correspond to the data samples for training, evaluation, and testing used in instruction fine-tuning and fine-tuning scenarios, respectively. You need to fill the local data paths into `DATASET_ADDITIONAL_ARGS` of `train.py` according to the task names to read the samples from the paths you provided; the second part is `GPTDynamics/gptdynamics/GPTDynamics.tar`, which contains the training runs, you need to extract:
 ```
 tar -xvf GPTDynamics.tar
 ```
