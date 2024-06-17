@@ -59,10 +59,12 @@ You should specify the simulator's training and validation data in `train.py` vi
  # Citation
  For attribution in academic contexts, please cite this work as:
  ```
-@article{liu2024training,
-  title={On Training Data Influence of GPT Models},
-  author={Liu, Qingyi and Chai, Yekun and Wang, Shuohuan and Sun, Yu and Wang, Keze and Wu, Hua},
-  journal={arXiv preprint arXiv:2404.07840},
-  year={2024}
+@misc{liu2024training,
+      title={On Training Data Influence of GPT Models}, 
+      author={Qingyi Liu and Yekun Chai and Shuohuan Wang and Yu Sun and Qiwei Peng and Keze Wang and Hua Wu},
+      year={2024},
+      eprint={2404.07840},
+      archivePrefix={arXiv},
+      primaryClass={id='cs.CL' full_name='Computation and Language' is_active=True alt_name='cmp-lg' in_archive='cs' is_general=False description='Covers natural language processing. Roughly includes material in ACM Subject Class I.2.7. Note that work on artificial languages (programming languages, logics, formal systems) that does not explicitly address natural-language issues broadly construed (natural-language processing, computational linguistics, speech, text retrieval, etc.) is not appropriate for this area.'}
 }
  ```
