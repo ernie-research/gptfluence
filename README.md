@@ -1,4 +1,4 @@
-# [EMNLP'24 | On Training Data Influence of GPT Models](https://arxiv.org/abs/2404.07840)
+# [EMNLP'24 (Oral) | On Training Data Influence of GPT Models](https://arxiv.org/abs/2404.07840)
 
    <a href="https://huggingface.co/datasets/baidu/GPTDynamics" target="_blank">
       <img alt="Datasets" src="https://img.shields.io/badge/📚-Dataset-orange" />
@@ -11,7 +11,7 @@ The official repository which contains the code and model checkpoints for our pa
 
 
 ## 🔥 News
-* **21 September, 2024:** 🎉 Our work has been accepted to [EMNLP 2024](https://2024.emnlp.org/)! 🎉
+* **21 September, 2024:** 🎉 Our work has been accepted to [EMNLP 2024 (Oral)](https://2024.emnlp.org/)! 🎉
 * **1 May, 2024:** 🎉 We release the official dataset of [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics)!🔥
 
 ![image](https://github.com/ernie-research/gptfluence/blob/main/resources/overview.png)
