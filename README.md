@@ -1,13 +1,13 @@
-# [EMNLP'24 (Oral) | On Training Data Influence of GPT Models](https://arxiv.org/abs/2404.07840)
+# [EMNLP'24 (Oral) | On Training Data Influence of GPT Models](https://aclanthology.org/2024.emnlp-main.183/)
 
    <a href="https://huggingface.co/datasets/baidu/GPTDynamics" target="_blank">
       <img alt="Datasets" src="https://img.shields.io/badge/📚-Dataset-orange" />
    </a> 
-   <a href="https://arxiv.org/abs/2404.07840" target="_blank"><img alt="Paper" src="https://img.shields.io/badge/📜-Paper-purple" /></a>
+   <a href="https://aclanthology.org/2024.emnlp-main.183/" target="_blank"><img alt="Paper" src="https://img.shields.io/badge/📜-Paper-purple" /></a>
   <a href="https://2024.emnlp.org/" target="_blank"> <img alt="EMNLP 2024" src="https://img.shields.io/badge/Proceedings-EMNLP2024-red" /> </a>
 
 
-The official repository which contains the code and model checkpoints for our paper [On Training Data Influence of GPT Models (EMNLP 2024)](https://arxiv.org/pdf/2404.07840).
+The official repository which contains the code and model checkpoints for our paper [On Training Data Influence of GPT Models (EMNLP 2024)](https://aclanthology.org/2024.emnlp-main.183.pdf).
 
 
 ## 🔥 News
@@ -71,16 +71,27 @@ You should specify the simulator's training and validation data in `train.py` vi
  ```
  bash auto_test_metric.sh
  ```
- ## Citation
- For attribution in academic contexts, please cite this work as:
- ```
- @misc{chai2024trainingdatainfluencegpt,
-  title = {On Training Data Influence of GPT Models},
-  author = {Chai, Yekun and Liu, Qingyi and Wang, Shuohuan and Sun, Yu and Peng, Qiwei and Wu, Hua},
-  year = {2024},
-  eprint = {2404.07840},
-  archiveprefix = {arXiv},
-  primaryclass = {cs.CL},
-  url = {https://arxiv.org/abs/2404.07840},
- }
- ```
+
+## Citation
+```
+@inproceedings{chai-etal-2024-training,
+    title = "On Training Data Influence of {GPT} Models",
+    author = "Chai, Yekun  and
+      Liu, Qingyi  and
+      Wang, Shuohuan  and
+      Sun, Yu  and
+      Peng, Qiwei  and
+      Wu, Hua",
+    editor = "Al-Onaizan, Yaser  and
+      Bansal, Mohit  and
+      Chen, Yun-Nung",
+    booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2024",
+    address = "Miami, Florida, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.emnlp-main.183",
+    pages = "3126--3150",
+    abstract = "Amidst the rapid advancements in generative language models, the investigation of how training data shapes the performance of GPT models is still emerging. This paper presents GPTfluence, a novel approach that leverages a featurized simulation to assess the impact of training examples on the training dynamics of GPT models. Our approach not only traces the influence of individual training instances on performance trajectories, such as loss and other key metrics, on targeted test points but also enables a comprehensive comparison with existing methods across various training scenarios in GPT models, ranging from 14 million to 2.8 billion parameters, across a range of downstream tasks. Contrary to earlier methods that struggle with generalization to new data, GPTfluence introduces a parameterized simulation of training dynamics, demonstrating robust generalization capabilities to unseen training data. This adaptability is evident across both fine-tuning and instruction-tuning scenarios, spanning tasks in natural language understanding and generation. We make our code and data publicly available at https://github.com/ernie-research/gptfluence.",
+}
+```
