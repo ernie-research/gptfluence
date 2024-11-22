@@ -57,32 +57,32 @@ DATASET = {
 DATASET_ADDITIONAL_ARGS = {
     "": {},
     'rte': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_399_train.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/rte/rte_0_276_eval.json',
+        'train_data_path': './gptdynamics/sft_tasks/rte/rte_0_399_train.json',
+        'eval_data_path': './gptdynamics/sft_tasks/rte/rte_0_276_eval.json',
     },
     'boolq': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/boolq/boolq_train_0-199.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/boolq/boolq_validation_0-199.json',
+        'train_data_path': './gptdynamics/sft_tasks/boolq/boolq_train_0-199.json',
+        'eval_data_path': './gptdynamics/sft_tasks/boolq/boolq_validation_0-199.json',
     },
     'sst2': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_train_0-199.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_validation_0-199.json'
+        'train_data_path': './gptdynamics/sft_tasks/sst2/sst2_train_0-199.json',
+        'eval_data_path': './gptdynamics/sft_tasks/sst2/sst2_validation_0-199.json'
     },
     'webnlg': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/webnlg/webnlg_train_0-399.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/webnlg/webnlg_dev_0-177.json'
+        'train_data_path': './gptdynamics/sft_tasks/webnlg/webnlg_train_0-399.json',
+        'eval_data_path': './gptdynamics/sft_tasks/webnlg/webnlg_dev_0-177.json'
     },
     'wmt16_de_en': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/wmt16_de_en/wmt16_de_en_train_0-199.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/wmt16_de_en/wmt16_de_en_test_0-199.json'
+        'train_data_path': './gptdynamics/sft_tasks/wmt16_de_en/wmt16_de_en_train_0-199.json',
+        'eval_data_path': './gptdynamics/sft_tasks/wmt16_de_en/wmt16_de_en_test_0-199.json'
     },
     'flan': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_flan/train/flan_train_0_1599.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_flan/eval/flan_eval_0_1054.json'
+        'train_data_path': './gptdynamics/it_tasks/flan_train_0_1599.json',
+        'eval_data_path': './gptdynamics/it_tasks/flan_eval_0_1054.json'
     },
     'dataset_debug_sst2': {
-        'train_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_flan-prompt_dataset-debug_mislabelled-0.4_train_0-127.json',
-        'eval_data_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/tda_tasks/sst2/sst2_flan-prompt_dataset-debug_eval_0-127.json'
+        'train_data_path': './gptdynamics/sft_tasks/sst2/sst2_flan-prompt_dataset-debug_mislabelled-0.4_train_0-127.json',
+        'eval_data_path': './gptdynamics/sft_tasks/sst2/sst2_flan-prompt_dataset-debug_eval_0-127.json'
     }
 }
 
@@ -105,26 +105,26 @@ SIMULATR_ADDIONAL_ARGS = {
         'emb_dim': 2
     },
     'xlmr_sim': {
-        'xlmr_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/xlm_roberta_base',
-        'train_xlm_ids_file': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/wmt18/tr-en/en-tr_tgt-en_xlmr-ids.json',
-        'test_xlm_ids_file': '/root/paddlejob/workspace/env_run/liuqingyi01/data/eval_data/wmt18/tr-en/dev/newsdev2016-tren-tren_xlmr-ids.json',
+        'xlmr_model_name_or_path': './model/xlm_roberta_base',
+        'train_xlm_ids_file': './eval_data/wmt18/tr-en/en-tr_tgt-en_xlmr-ids.json',
+        'test_xlm_ids_file': './eval_data/wmt18/tr-en/dev/newsdev2016-tren-tren_xlmr-ids.json',
     },
     'enc_sim': {
-        'enc_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/models--sentence-transformers--all-MiniLM-L6-v2/',
+        'enc_model_name_or_path': '../hf_hub/models--sentence-transformers--all-MiniLM-L6-v2/',
         'frozen': True,
         'use_initial': True,
         'concate': False
     },
     'norder_enc_sim': {
         'order_n': 10,
-        'enc_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/models--sentence-transformers--all-MiniLM-L6-v2/',
+        'enc_model_name_or_path': './model/models--sentence-transformers--all-MiniLM-L6-v2/',
         'frozen': True,
         'use_initial': True,
         'concate': True
     },
     "tracincp_sim": {},
     "enc_cp_sim": {
-        'enc_model_name_or_path': '/root/paddlejob/workspace/env_run/liuqingyi01/data/model/models--sentence-transformers--all-MiniLM-L6-v2/',
+        'enc_model_name_or_path': './model/models--sentence-transformers--all-MiniLM-L6-v2/',
         'frozen': True,
         'use_initial': True,
         'concate': False,
@@ -204,19 +204,16 @@ SAVE_DIR_IGNORED_ARG_NAME = {
 }
 
 def train(
-    sim_name = "original",
-    dataset_name = "",
-    metric = "",
-    task="",
+    sim_name, # [Options]: enc_sim | original
+    dataset_name, # [Options]: rte | boolq | sst2 | webnlg | wmt16_de_en | flan | dataset_debug_sst2
+    metric, # [Options]: loss | bleu | rougeL
+    task, # [Options]: boolq | sst2 | rte | webnlg | wmt16_de_en | flan | flan_pythia-14m | flan_pythia-70m | flan_pythia-1b
+    test_example_start_id,
+    test_example_end_id,
     max_epoch = 2000,
-    # train_run = 22,
-    # val_run = 10,
     train_bs = 128,
-    # valid_bs = 16,
     train_example_nums = 205756,
     test_example_nums = 10,
-    # num_samples_to_valid = 100,
-    # num_samples_to_select = 64,
     seed=42,
     hyper_parameter=0.,
     lr=0.00001,
@@ -227,8 +224,6 @@ def train(
     test_num = 2,
     weight_decay=0.,
     step_thres=None,
-    test_example_start_id=-1,
-    test_example_end_id=-1,
     order_n=None,
     concate=None,
     cp_interval=None,
@@ -610,7 +605,7 @@ def train(
     print(
         # f"data_paths: {data_paths}\n",
         f"dataset_name: {dataset_name}\n",
-        f"metric: {metric}\n",
+        f"metric: {metric}\n", # loss | bleu | rouge
         f"task: {task}\n",
         f"sim_name: {sim_name}\n",
         f"max_epoch: {max_epoch}\n",
@@ -619,7 +614,7 @@ def train(
         f"train_example_nums: {train_example_nums}\n",
         f"test_example_nums: {test_example_nums}\n",
         # f"valid_bs: {valid_bs}\n",
-        f"seed: {seed}\n",
+        f"seed: {seed}\n", # 种子
         f"hyper_parameter: {hyper_parameter}\n"
         f"valid_epoch_interval: {valid_epoch_interval}\n",
         f"save_epoch_interval: {save_epoch_interval}\n",

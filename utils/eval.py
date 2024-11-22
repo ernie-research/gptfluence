@@ -4,50 +4,61 @@ from tqdm import tqdm
 from collections import defaultdict
 import os
 
-with torch.no_grad():
-    def eval_simulator(eval_dataset, model, device, input_kwargs_keys):
-        model.eval()
-        all_steps_mse = 0.
-        all_steps_mae = 0.
-        all_steps_mse_list = []
-        all_steps_mae_list = []
-        pred_loss_dict = defaultdict(list)
-        for eval_data in tqdm(eval_dataset):
-            step_mse_loss_list = []
-            steps_mae_list = []
-            predict_loss = None
-            test_sample_id = eval_data[0]["test_sample_id"]
-            start_step = eval_data[0]["prev_step"]
-            start_loss = eval_data[0]["prev_loss"]
+def eval_simulator(eval_dataset, model, device, input_kwargs_keys):
+    model.eval()
+    all_steps_mse = 0.
+    all_steps_mae = 0.
+    all_steps_mse_list = []
+    all_steps_mae_list = []
+    pred_loss_dict = defaultdict(list)
+    for eval_data in tqdm(eval_dataset):
+        step_mse_loss_list = []
+        steps_mae_list = []
+        predict_loss = None
+        test_sample_id = eval_data[0]["test_sample_id"]
+        start_step = eval_data[0]["prev_step"]
+        start_loss = eval_data[0]["prev_loss"]
+        
+        # pred_loss_dict[test_sample_id] = {
+        #     'pred_loss': [start_loss],
+        #     'step': [start_step]
+        # }
+        pred_loss_dict[test_sample_id].append(
+            {
+                'gt_loss': [start_loss],
+                'pred_loss': [start_loss],
+                'step': [start_step]
+            }
+        )
+        for step, data in enumerate(eval_data):
+            before_loss = None
+            if step == 0:
+                before_loss = torch.tensor([data["prev_loss"]]).to(device)
+            else: 
+                before_loss = torch.tensor([predict_loss]).to(device)
             
-            # pred_loss_dict[test_sample_id] = {
-            #     'pred_loss': [start_loss],
-            #     'step': [start_step]
-            # }
-            pred_loss_dict[test_sample_id].append(
-                {
-                    'gt_loss': [start_loss],
-                    'pred_loss': [start_loss],
-                    'step': [start_step]
-                }
-            )
-            for step, data in enumerate(eval_data):
-                before_loss = None
-                if step == 0:
-                    before_loss = torch.tensor([data["prev_loss"]]).to(device)
-                else: 
-                    before_loss = torch.tensor([predict_loss]).to(device)
-                
-                input_kwargs = {key: data[key] for key in input_kwargs_keys}
+            input_kwargs = {key: data[key] for key in input_kwargs_keys}
 
-                # # 如果是n-th order markov
-                if 'prev_n_losses' in input_kwargs_keys and 'prev_n_steps' in input_kwargs_keys:
-                    # 取出预测的前N步loss
-                    N = model.order_n
-                    prev_pred_n_losses = pred_loss_dict[test_sample_id][-1]['pred_loss'][-N:]
-                    prev_pred_n_losses = [0] * (N - len(prev_pred_n_losses)) + prev_pred_n_losses
-                    input_kwargs['prev_n_losses'] = torch.tensor([prev_pred_n_losses]).to(device)
+            # # 如果是n-th order markov
+            if 'prev_n_losses' in input_kwargs_keys and 'prev_n_steps' in input_kwargs_keys:
+                # 取出预测的前N步loss
+                N = model.order_n
+                prev_pred_n_losses = pred_loss_dict[test_sample_id][-1]['pred_loss'][-N:]
+                prev_pred_n_losses = [0] * (N - len(prev_pred_n_losses)) + prev_pred_n_losses
+                input_kwargs['prev_n_losses'] = torch.tensor([prev_pred_n_losses]).to(device)
 
+            # output = model(
+            #     orders=torch.tensor([data["samples_id"]]).to(device),
+            #     before_loss=before_loss,
+            #     after_loss=torch.tensor([data["cur_loss"]]).to(device),
+            #     test_sample_ids=torch.tensor([data["test_sample_id"]]).to(device),
+            #     is_train=False,
+            #     device=device,
+            #     kwargs=input_kwargs
+            # )
+            
+            # 前向传播的关键部分
+            with torch.no_grad():
                 output = model(
                     orders=torch.tensor([data["samples_id"]]).to(device),
                     before_loss=before_loss,
@@ -57,58 +68,58 @@ with torch.no_grad():
                     device=device,
                     kwargs=input_kwargs
                 )
-                # # ===== 计算FLOPs =====
-                #     kwargs=input_kwargs
-                # )
-                # from thop import profile
-                # macs, params = profile(model, inputs=(torch.tensor([data["samples_id"]]).to(device),
-                #     before_loss,
-                #     torch.tensor([data["cur_loss"]]).to(device),
-                #     torch.tensor([data["test_sample_id"]]).to(device),
-                #     False,
-                #     device,
-                #     input_kwargs)
-                # )
-                # print(macs)
-                # import pdb; pdb.set_trace()
+            # # ===== 计算FLOPs =====
+            #     kwargs=input_kwargs
+            # )
+            # from thop import profile
+            # macs, params = profile(model, inputs=(torch.tensor([data["samples_id"]]).to(device),
+            #     before_loss,
+            #     torch.tensor([data["cur_loss"]]).to(device),
+            #     torch.tensor([data["test_sample_id"]]).to(device),
+            #     False,
+            #     device,
+            #     input_kwargs)
+            # )
+            # print(macs)
+            # import pdb; pdb.set_trace()
 
-                if torch.isnan(output['mse_loss']).all():
-                    raise ValueError(f"mse_loss is nan, before loss is {predict_loss}")
+            if torch.isnan(output['mse_loss']).all():
+                raise ValueError(f"mse_loss is nan, before loss is {predict_loss}")
 
-                if torch.isnan(output['predict_loss']).all():
-                    raise ValueError(f"predict_loss is nan, before loss is {predict_loss}")
+            if torch.isnan(output['predict_loss']).all():
+                raise ValueError(f"predict_loss is nan, before loss is {predict_loss}")
 
-                predict_loss = output['predict_loss'].item()
-                pred_loss_dict[test_sample_id][-1]['gt_loss'].append(data['cur_loss'])
-                pred_loss_dict[test_sample_id][-1]['pred_loss'].append(predict_loss)
-                pred_loss_dict[test_sample_id][-1]['step'].append(data['cur_step'])
+            predict_loss = output['predict_loss'].item()
+            pred_loss_dict[test_sample_id][-1]['gt_loss'].append(data['cur_loss'])
+            pred_loss_dict[test_sample_id][-1]['pred_loss'].append(predict_loss)
+            pred_loss_dict[test_sample_id][-1]['step'].append(data['cur_step'])
 
-                step_mse_loss = output['mse_loss'].item()
-                step_mse_loss_list.append(step_mse_loss)
-                steps_mae_list.append(abs(predict_loss - data['cur_loss']))
-            # all_steps_mse += np.array(step_mse_loss_list).mean()
-            # all_steps_mae += np.array(steps_mae_list).mean()
-            all_steps_mse_list.append(np.array(step_mse_loss_list).mean())
-            all_steps_mae_list.append(np.array(steps_mae_list).mean())
-        
-        # 计算不同runs的指标均值和方差
-        # all steps mse
-        all_steps_mse_np = np.array(all_steps_mse_list)
-        all_steps_mse_mean = all_steps_mse_np.mean()
-        all_steps_mse_std = all_steps_mse_np.std()
-        # all steps mae
-        all_steps_mae_np = np.array(all_steps_mae_list)
-        all_steps_mae_mean = all_steps_mae_np.mean()
-        all_steps_mae_std = all_steps_mae_np.std()
-        
-        return {
-            'all_steps_mse_mean': all_steps_mse_mean,
-            'all_steps_mse_std': all_steps_mse_std,
-            'all_steps_mae_mean': all_steps_mae_mean,
-            'all_steps_mae_std': all_steps_mae_std,
-            'pred_loss_dict': pred_loss_dict
-        }
+            step_mse_loss = output['mse_loss'].item()
+            step_mse_loss_list.append(step_mse_loss)
+            steps_mae_list.append(abs(predict_loss - data['cur_loss']))
+        # all_steps_mse += np.array(step_mse_loss_list).mean()
+        # all_steps_mae += np.array(steps_mae_list).mean()
+        all_steps_mse_list.append(np.array(step_mse_loss_list).mean())
+        all_steps_mae_list.append(np.array(steps_mae_list).mean())
     
+    # 计算不同runs的指标均值和方差
+    # all steps mse
+    all_steps_mse_np = np.array(all_steps_mse_list)
+    all_steps_mse_mean = all_steps_mse_np.mean()
+    all_steps_mse_std = all_steps_mse_np.std()
+    # all steps mae
+    all_steps_mae_np = np.array(all_steps_mae_list)
+    all_steps_mae_mean = all_steps_mae_np.mean()
+    all_steps_mae_std = all_steps_mae_np.std()
+    
+    return {
+        'all_steps_mse_mean': all_steps_mse_mean,
+        'all_steps_mse_std': all_steps_mse_std,
+        'all_steps_mae_mean': all_steps_mae_mean,
+        'all_steps_mae_std': all_steps_mae_std,
+        'pred_loss_dict': pred_loss_dict
+    }
+
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 def eval_tracincp_simulator(eval_dataset, model, device, step_ckpt_dir, input_kwargs_keys, ckpt_steps=None):
@@ -288,20 +299,19 @@ def eval_tracincp_self_influence(eval_dataset, model, device, step_ckpt_dir, inp
         'self_influence': train_sample_influence
     }
 
-with torch.no_grad():
-    def eval_simulator_self_fluence(eval_dataset, model, device, input_kwargs_keys):
-        model.eval()
-        for eval_data in tqdm(eval_dataset):
-            predict_loss = None
-            test_sample_id = eval_data[0]["test_sample_id"]
+def eval_simulator_self_fluence(eval_dataset, model, device, input_kwargs_keys):
+    model.eval()
+    for eval_data in tqdm(eval_dataset):
+        predict_loss = None
+        test_sample_id = eval_data[0]["test_sample_id"]
+        
+        for step, data in enumerate(eval_data):
+            input_kwargs = {key: data[key] for key in input_kwargs_keys}
+
+        for i, sample_id in enumerate(data['samples_id']):
+            new_input_kwargs = input_kwargs.copy()
             
-            for step, data in enumerate(eval_data):
-                input_kwargs = {key: data[key] for key in input_kwargs_keys}
-
-            for i, sample_id in enumerate(data['samples_id']):
-                new_input_kwargs = input_kwargs.copy()
-                
-
+            with torch.no_grad():
                 output = model(
                     orders=torch.tensor([data["samples_id"]]).to(device),
                     test_sample_ids=torch.tensor([data["test_sample_id"]]).to(device),
@@ -309,13 +319,3 @@ with torch.no_grad():
                     device=device,
                     **input_kwargs
                 )
-
-        
-        
-        # return {
-        #     'all_steps_mse_mean': all_steps_mse_mean,
-        #     'all_steps_mse_std': all_steps_mse_std,
-        #     'all_steps_mae_mean': all_steps_mae_mean,
-        #     'all_steps_mae_std': all_steps_mae_std,
-        #     'pred_loss_dict': None
-        # }

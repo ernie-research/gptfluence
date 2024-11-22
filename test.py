@@ -122,17 +122,17 @@ data_paths_dict = {
     ]
 }
 def main(
-    test_example_nums = 200,
-    train_example_nums = 200,
-    task = '',
-    metric = "",
-    sim_name = "original", # "vec_sim" "original"
-    dataset_name = "boolq",
-    check_point_path = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None/checkpoint-233.pt",
-    save_dir = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/output/original_task-output_boolq_bs-4_shot-200_sample-128_model-pythia-410m-deduped_lr-5e-7_weight-decay-0.001_epoch-3_lr-0.001_lambda-0.0_bs-128_train-sample-nums-200_test-sample-nums-200_seed-42_step_thres-None",
+    test_example_nums,
+    train_example_nums,
+    task, # [Options]: boolq | sst2 | rte | webnlg | wmt16_de_en | flan | flan_pythia-14m | flan_pythia-70m | flan_pythia-1b  
+    metric, # [Options]: loss | bleu | rougeL
+    sim_name, # [Options]: enc_sim | original
+    dataset_name, # [Options]: rte | boolq | sst2 | webnlg | wmt16_de_en | flan | dataset_debug_sst2
+    checkpoint_path,
+    save_dir,
+    test_example_start_id,
+    test_example_end_id,
     hyper_parameter = 0.,
-    test_example_start_id=-1,
-    test_example_end_id=-1,
     order_n=None,
     concate=None,
 ):
@@ -190,7 +190,7 @@ def main(
     if sim_name == 'enc_sim' or sim_name == 'norder_enc_sim' or sim_name == 'enc_cp_sim' or sim_name == 'gpt_sim':
         if simulator_args['use_initial']:
             model._get_initial_embeds(test_dataset, device)
-    model.load_state_dict(torch.load(check_point_path))
+    model.load_state_dict(torch.load(checkpoint_path))
     model.to(device)
 
     print("\n开始测试...")
