@@ -10,13 +10,16 @@ fi
 export CUDA_VISIBLE_DEVICES=$cuda
 
 python train.py --sim_name enc_sim \
-    --dataset_name rte \
-    --task output_rte_bs-4_shot-200_sample-128_lr-2e-6_weight-decay-0.001_epoch-3 \
+    --dataset_name webnlg \
+    --task webnlg \
     --output_dir ./output \
-    --max_epoch 300 \
+    --max_epoch 1 \
     --train_bs 128 \
     --train_example_nums 200 \
-    --test_example_nums 277 \
+    --test_example_nums 200 \
+    --test_example_start_id 0\
+    --test_example_end_id 99\
+    --metric bleu\
     --seed 42 \
     --hyper_parameter 0. \
     --lr 0.0001 \
