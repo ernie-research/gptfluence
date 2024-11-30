@@ -22,10 +22,12 @@ start = time.time()
 TASK='rte'
 
 # run数据本地保存根目录
-SAVE_ROOT_DIR = f"runs/{TASK}"
+SAVE_ROOT_DIR = f"/home/zhuliyi/code/tmp_gptfluence/gptfluence/data/runs/{TASK}"
 
 # 输出根目录
-OURPUT_ROOT_DIR = "/root/paddlejob/workspace/liuqingyi01/code/Simfluence/tmp"
+OURPUT_ROOT_DIR = "/home/zhuliyi/code/tmp_gptfluence/gptfluence/output/tmp"
+
+
 
 # 输出文件
 OUTPUT_FILE_NAME_LIST = [
@@ -117,6 +119,14 @@ for output_file_name in OUTPUT_FILE_NAME_LIST:
     # train_samples_id.json 格式：
     #    {'step': step1, 'samples_id': samples_id1}
     #    {'step': step2, 'samples_id': samples_id2}
+    if not os.path.exists(OURPUT_ROOT_DIR):
+        # 如果文件夹不存在，则创建
+        os.makedirs(OURPUT_ROOT_DIR)
+        print(f"文件夹 '{OURPUT_ROOT_DIR}' 已创建。")
+    else:
+        # 如果文件夹存在，则跳过
+        print(f"文件夹 '{OURPUT_ROOT_DIR}' 已存在，无需创建。")
+    
     log_path = os.path.join(OURPUT_ROOT_DIR, output_file_name, 'log.out')
     train_data_list = []
     with open(log_path, "r") as f:
