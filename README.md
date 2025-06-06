@@ -1,6 +1,6 @@
 # [EMNLP'24 (Oral) | On Training Data Influence of GPT Models](https://aclanthology.org/2024.emnlp-main.183/)
 
-   <a href="https://huggingface.co/datasets/baidu/GPTDynamics" target="_blank">
+   <a href="https://huggingface.co/datasets/ernie-research/GPTDynamics" target="_blank">
       <img alt="Datasets" src="https://img.shields.io/badge/📚-Dataset-orange" />
    </a> 
    <a href="https://aclanthology.org/2024.emnlp-main.183/" target="_blank"><img alt="Paper" src="https://img.shields.io/badge/📜-Paper-purple" /></a>
@@ -12,7 +12,7 @@ The official repository which contains the code and model checkpoints for our pa
 
 ## 🔥 News
 * **21 September, 2024:** 🎉 Our work has been accepted to [EMNLP 2024 (Oral)](https://2024.emnlp.org/)! 🎉
-* **1 May, 2024:** 🎉 We release the official dataset of [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics)!🔥
+* **1 May, 2024:** 🎉 We release the official dataset of [ernie-research/GPTDynamics](https://huggingface.co/datasets/ernie-research/GPTDynamics)!🔥
 
 ![image](https://github.com/ernie-research/gptfluence/blob/main/resources/overview.png)
 Amidst the rapid advancements in generative language models, the investigation of how training data shapes the performance of GPT models is still emerging. This paper presents GPTfluence, a novel approach that leverages a featurized simulation to assess the impact of training examples on the training dynamics of GPT models. Our approach not only traces the influence of individual training instances on performance trajectories, such as loss and other key metrics, on targeted test points but also enables a comprehensive comparison with existing methods across various training scenarios in GPT models, ranging from 14 million to 2.8 billion parameters, across a range of downstream tasks. Contrary to earlier methods that struggle with generalization to new data, GPTfluence introduces a parameterized simulation of training dynamics, demonstrating robust generalization capabilities to unseen training data. This adaptability is evident across both fine-tuning and instruction-tuning scenarios, spanning tasks in natural language understanding and generation. 
@@ -22,9 +22,9 @@ To set up the environment and install dependencies, run:
 bash run_requirements.sh
 ```
 ## 📚 GPTDynamics Data
-We release the GPTDynamics for training and testing the featurized simulator in [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics). To preprocess the data, you should follow the instructions below:
+We release the GPTDynamics for training and testing the featurized simulator in [ernie-research/GPTDynamics](https://huggingface.co/datasets/ernie-research/GPTDynamics). To preprocess the data, you should follow the instructions below:
 ### Download
-First, you need to download the data in the `GPTDynamics/gptdynamics` directory from [baidu/GPTDynamics](https://huggingface.co/datasets/baidu/GPTDynamics) locally. The data contains two parts, the first part is `GPTDynamics/gptdynamics/it_tasks` and `GPTDynamics/gptdynamics/sft_tasks` correspond to the data samples for training, evaluation, and testing used in instruction-tuning and fine-tuning scenarios, respectively. You need to fill the local data paths into `DATASET_ADDITIONAL_ARGS` of `train.py` according to the task names to read the samples from the paths you provided; the second part is `GPTDynamics/gptdynamics/GPTDynamics.tar`, which contains the training runs, you need to extract:
+First, you need to download the data in the `GPTDynamics/gptdynamics` directory from [ernie-research/GPTDynamics](https://huggingface.co/datasets/ernie-research/GPTDynamics) locally. The data contains two parts, the first part is `GPTDynamics/gptdynamics/it_tasks` and `GPTDynamics/gptdynamics/sft_tasks` correspond to the data samples for training, evaluation, and testing used in instruction-tuning and fine-tuning scenarios, respectively. You need to fill the local data paths into `DATASET_ADDITIONAL_ARGS` of `train.py` according to the task names to read the samples from the paths you provided; the second part is `GPTDynamics/gptdynamics/GPTDynamics.tar`, which contains the training runs, you need to extract:
 ```
 tar -xvf GPTDynamics.tar
 ```
